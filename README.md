@@ -1,10 +1,25 @@
-[![Blitz.js](https://raw.githubusercontent.com/blitz-js/art/master/github-cover-photo.png)](https://blitzjs.com)
 
-This is a [Blitz.js](https://github.com/blitz-js/blitz) app.
 
-# **integrative-therapy**
+# 🦋 Integrative Therapy Search Network
+
+## About
+
+This is a [Code 4 Community](c4cneu.com) project in collaboration with [Lucy's Love Bus](https://lucyslovebus.org/).
+
+Lucy's Love Bus assists children with life threatening illnesses and their families. One service they provide is connecting families with resources in their area. It can be difficult, however, to determine what integrative therapy solutions are available.
+
+This service aims to provide a public search network that will allow users to search for therapists vetted by Lucy's Love Bus, and filter based on conditions that are relevant for their familiy.
 
 ## Getting Started
+
+Read about our development guidlines at [CONTRIBUTING.md](CONTRIBUTING.md).
+
+Install Blitz globally and install dependencies. We use `yarn` instead of `npm`
+```
+npm i -g yarn
+yarn global blitz
+yarn install
+```
 
 Run your app in the development mode.
 
