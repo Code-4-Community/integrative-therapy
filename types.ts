@@ -7,6 +7,10 @@ export type Role = "ADMIN" | "USER"
 declare module "blitz" {
   export interface Ctx extends DefaultCtx {
     session: SessionContext
+    /**
+     * Injected Enhanced Prisma Client instance.
+     * Attached to Ctx via global middleware in `blitz.config.ts`.
+     */
     db: Db
   }
   export interface Session {

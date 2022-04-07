@@ -10,6 +10,7 @@ const mockCtx: any = {
   session: {
     $create: jest.fn,
   },
+  db, // using real db instance
 }
 
 describe("resetPassword mutation", () => {

@@ -1,4 +1,5 @@
 import { BlitzConfig, sessionMiddleware, simpleRolesIsAuthorized } from "blitz"
+import db from "db"
 
 const config: BlitzConfig = {
   middleware: [
@@ -6,6 +7,11 @@ const config: BlitzConfig = {
       cookiePrefix: "integrative-therapy",
       isAuthorized: simpleRolesIsAuthorized,
     }),
+    (_, res, next) => {
+      // Inject the db into the context
+      res.blitzCtx.db = db
+      return next()
+    },
   ],
   /* Uncomment this to customize the webpack config
   webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {

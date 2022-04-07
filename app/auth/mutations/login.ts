@@ -1,4 +1,3 @@
-import { injectDb } from "app/core/custom-resolvers/resolvers"
 import { AuthenticationError, Ctx, resolver, SecurePassword } from "blitz"
 import { Role } from "types"
 import { Login } from "../validations"
@@ -20,7 +19,7 @@ export const authenticateUser = async (rawEmail: string, rawPassword: string, { 
   return rest
 }
 
-export default resolver.pipe(injectDb, resolver.zod(Login), async ({ email, password }, ctx) => {
+export default resolver.pipe(resolver.zod(Login), async ({ email, password }, ctx) => {
   // This throws an error if credentials are invalid
   const user = await authenticateUser(email, password, ctx)
 

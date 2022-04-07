@@ -1,7 +1,7 @@
-import { hash256, Ctx } from "blitz"
-import forgotPassword from "./forgotPassword"
+import { Ctx, hash256 } from "blitz"
 import db from "db"
 import previewEmail from "preview-email"
+import forgotPassword from "./forgotPassword"
 
 beforeEach(async () => {
   await db.$reset()
@@ -16,7 +16,9 @@ jest.mock("preview-email", () => jest.fn())
 
 describe("forgotPassword mutation", () => {
   it("does not throw error if user doesn't exist", async () => {
-    await expect(forgotPassword({ email: "no-user@email.com" }, {} as Ctx)).resolves.not.toThrow()
+    await expect(
+      forgotPassword({ email: "no-user@email.com" }, { db } as Ctx)
+    ).resolves.not.toThrow()
   })
 
   it("works correctly", async () => {
@@ -38,7 +40,7 @@ describe("forgotPassword mutation", () => {
     })
 
     // Invoke the mutation
-    await forgotPassword({ email: user.email }, {} as Ctx)
+    await forgotPassword({ email: user.email }, { db } as Ctx)
 
     const tokens = await db.token.findMany({ where: { userId: user.id } })
     const token = tokens[0]

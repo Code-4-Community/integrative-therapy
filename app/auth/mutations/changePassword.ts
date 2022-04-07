@@ -1,10 +1,8 @@
-import { NotFoundError, SecurePassword, resolver } from "blitz"
-import { authenticateUser } from "./login"
+import { NotFoundError, resolver, SecurePassword } from "blitz"
 import { ChangePassword } from "../validations"
-import { injectDb } from "app/core/custom-resolvers/resolvers"
+import { authenticateUser } from "./login"
 
 export default resolver.pipe(
-  injectDb,
   resolver.zod(ChangePassword),
   resolver.authorize(),
   async ({ currentPassword, newPassword }, ctx) => {
