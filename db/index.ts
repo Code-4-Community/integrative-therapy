@@ -1,7 +1,9 @@
-import { enhancePrisma } from "blitz"
 import { PrismaClient } from "@prisma/client"
+import { enhancePrisma } from "blitz"
 
 const EnhancedPrisma = enhancePrisma(PrismaClient)
 
 export * from "@prisma/client"
-export default new EnhancedPrisma()
+const db = new EnhancedPrisma()
+export default db
+export type Db = typeof db
