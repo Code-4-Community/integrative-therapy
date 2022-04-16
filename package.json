@@ -14,7 +14,10 @@
     "cy:run": "cypress run",
     "test:server": "blitz prisma migrate deploy && blitz build && blitz start -p 3099",
     "test:e2e:ci": "cross-env NODE_ENV=test start-server-and-test test:server http://localhost:3099 cy:run",
-    "test:e2e": "cross-env NODE_ENV=test start-server-and-test test:server http://localhost:3099 cy:open"
+    "test:e2e": "cross-env NODE_ENV=test start-server-and-test test:server http://localhost:3099 cy:open",
+    "prepush": "yarn lint && prettier --check .",
+    "prettier:check": "prettier --check .",
+    "prettier:write": "prettier --write ."
   },
   "prisma": {
     "schema": "db/schema.prisma"
