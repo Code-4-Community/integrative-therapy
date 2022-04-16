@@ -1,5 +1,3 @@
-
-
 # 🦋 Integrative Therapy Search Network
 
 ## About
@@ -15,9 +13,10 @@ This service aims to provide a public search network that will allow users to se
 Read about our development guidlines at [CONTRIBUTING.md](CONTRIBUTING.md).
 
 Install Blitz globally and install dependencies. We use `yarn` instead of `npm`
+
 ```
 npm i -g yarn
-yarn global blitz
+yarn global add blitz cross-env start-server-and-test
 yarn install
 ```
 
