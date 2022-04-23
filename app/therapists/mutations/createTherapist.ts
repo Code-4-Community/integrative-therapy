@@ -8,7 +8,6 @@ const CreateTherapist = z.object({
 
 export default resolver.pipe(resolver.zod(CreateTherapist), resolver.authorize(), async (input) => {
   // TODO: in multi-tenant app, you must add validation to ensure correct tenant
-  const therapist = await db.therapist.create({ data: input })
-
-  return therapist
+  // const therapist = await db.therapist.create({ data: input })
+  // return therapist
 })
