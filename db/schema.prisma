@@ -63,3 +63,40 @@ model Token {
 // enum TokenType {
 //   RESET_PASSWORD
 // }
+
+enum TherapyType {
+  SOMETHING
+}
+
+model Location {
+  id        Int        @id @default(autoincrement())
+  zipCode   String
+  address   String
+  city      String
+  therapist Therapist?
+}
+
+model Therapist {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  name        String
+  description String
+  // type                   TherapyType
+  location    Location @relation(fields: [locationId], references: [id])
+  locationId  Int      @unique
+  // website                String
+  // providesInHomeServices Boolean
+  // languagesSpoken        Language[]
+  // certifications         String[]
+  // minimumAgeServed       Int
+  // profileImageUrl        String?
+  //badges                 Badge[]
+}
+
+// TODO: Add a model for the Badge
+enum Language {
+  ENGLISH
+  FRENCH
+  SPANISH
+}

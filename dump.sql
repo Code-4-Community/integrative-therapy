@@ -1,0 +1,2305 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 12.8
+-- Dumped by pg_dump version 12.9 (Ubuntu 12.9-0ubuntu0.20.04.1)
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- Name: func_set_updated_at_timestamp(); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.func_set_updated_at_timestamp() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    NEW.updated_at = now();
+    RETURN NEW;
+END;
+$$;
+
+
+ALTER FUNCTION public.func_set_updated_at_timestamp() OWNER TO postgres;
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- Name: blacklisted_refreshes; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.blacklisted_refreshes (
+    refresh_hash character varying(64) NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    expires timestamp without time zone NOT NULL
+);
+
+
+ALTER TABLE public.blacklisted_refreshes OWNER TO postgres;
+
+--
+-- Name: book_logs; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.book_logs (
+    id integer NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted_at timestamp without time zone,
+    school_id integer NOT NULL,
+    count integer NOT NULL,
+    date timestamp without time zone,
+    notes character varying(128)
+);
+
+
+ALTER TABLE public.book_logs OWNER TO postgres;
+
+--
+-- Name: book_logs_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.book_logs_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.book_logs_id_seq OWNER TO postgres;
+
+--
+-- Name: book_logs_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.book_logs_id_seq OWNED BY public.book_logs.id;
+
+
+--
+-- Name: flyway_schema_history; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.flyway_schema_history (
+    installed_rank integer NOT NULL,
+    version character varying(50),
+    description character varying(200) NOT NULL,
+    type character varying(20) NOT NULL,
+    script character varying(1000) NOT NULL,
+    checksum integer,
+    installed_by character varying(100) NOT NULL,
+    installed_on timestamp without time zone DEFAULT now() NOT NULL,
+    execution_time integer NOT NULL,
+    success boolean NOT NULL
+);
+
+
+ALTER TABLE public.flyway_schema_history OWNER TO postgres;
+
+--
+-- Name: school_contacts; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.school_contacts (
+    id integer NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted_at timestamp without time zone,
+    school_id integer NOT NULL,
+    email character varying(36),
+    address character varying(36),
+    phone character varying(36),
+    is_primary boolean DEFAULT false NOT NULL,
+    first_name character varying(36),
+    last_name character varying(36),
+    type character varying(36) NOT NULL
+);
+
+
+ALTER TABLE public.school_contacts OWNER TO postgres;
+
+--
+-- Name: school_contacts_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.school_contacts_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.school_contacts_id_seq OWNER TO postgres;
+
+--
+-- Name: school_contacts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.school_contacts_id_seq OWNED BY public.school_contacts.id;
+
+
+--
+-- Name: school_reports_with_libraries; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.school_reports_with_libraries (
+    id integer NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted_at timestamp without time zone,
+    user_id integer NOT NULL,
+    school_id integer NOT NULL,
+    number_of_children integer NOT NULL,
+    number_of_books integer NOT NULL,
+    most_recent_shipment_year integer,
+    is_shared_space boolean NOT NULL,
+    has_inviting_space boolean NOT NULL,
+    assigned_person_role character varying(32) NOT NULL,
+    assigned_person_title character varying(64),
+    apprenticeship_program character varying(64),
+    trains_and_mentors_apprentices boolean,
+    has_check_in_timetables boolean NOT NULL,
+    has_book_checkout_system boolean NOT NULL,
+    number_of_student_librarians integer NOT NULL,
+    reason_no_student_librarians character varying(128),
+    has_sufficient_training boolean NOT NULL,
+    teacher_support character varying(128),
+    parent_support character varying(128),
+    visit_reason character varying(128) NOT NULL,
+    action_plan character varying(512),
+    success_stories character varying(512),
+    grades_attended character varying(64)[],
+    checkin_timetable character varying(768),
+    checkout_timetable character varying(768) DEFAULT NULL::character varying,
+    number_of_student_librarians_trainers integer
+);
+
+
+ALTER TABLE public.school_reports_with_libraries OWNER TO postgres;
+
+--
+-- Name: school_reports_with_libraries_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.school_reports_with_libraries_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.school_reports_with_libraries_id_seq OWNER TO postgres;
+
+--
+-- Name: school_reports_with_libraries_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.school_reports_with_libraries_id_seq OWNED BY public.school_reports_with_libraries.id;
+
+
+--
+-- Name: school_reports_without_libraries; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.school_reports_without_libraries (
+    id integer NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted_at timestamp without time zone,
+    user_id integer NOT NULL,
+    school_id integer NOT NULL,
+    number_of_children integer NOT NULL,
+    number_of_books integer NOT NULL,
+    most_recent_shipment_year integer,
+    reason_why_not character varying(256) NOT NULL,
+    wants_library boolean NOT NULL,
+    has_space boolean NOT NULL,
+    ready_timeline character varying(64) NOT NULL,
+    visit_reason character varying(128) NOT NULL,
+    action_plan character varying(512),
+    success_stories character varying(512),
+    grades_attended character varying(64)[],
+    current_status character varying(64)[],
+    reason_no_library_space character varying(768) DEFAULT NULL::character varying
+);
+
+
+ALTER TABLE public.school_reports_without_libraries OWNER TO postgres;
+
+--
+-- Name: school_reports_without_libraries_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.school_reports_without_libraries_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.school_reports_without_libraries_id_seq OWNER TO postgres;
+
+--
+-- Name: school_reports_without_libraries_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.school_reports_without_libraries_id_seq OWNED BY public.school_reports_without_libraries.id;
+
+
+--
+-- Name: schools; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.schools (
+    id integer NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted_at timestamp without time zone,
+    name character varying(128) NOT NULL,
+    address character varying(128) NOT NULL,
+    hidden boolean DEFAULT false,
+    country character varying(32) NOT NULL,
+    area character varying(64),
+    phone character varying(36),
+    email character varying(36),
+    notes character varying(256),
+    library_status character varying(32) DEFAULT 'UNKNOWN'::character varying NOT NULL,
+    total_students integer
+);
+
+
+ALTER TABLE public.schools OWNER TO postgres;
+
+--
+-- Name: schools_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.schools_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.schools_id_seq OWNER TO postgres;
+
+--
+-- Name: schools_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.schools_id_seq OWNED BY public.schools.id;
+
+
+--
+-- Name: users; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.users (
+    id integer NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted_at timestamp without time zone,
+    email character varying(36) NOT NULL,
+    email_verified boolean DEFAULT false NOT NULL,
+    first_name character varying(36) NOT NULL,
+    last_name character varying(36) NOT NULL,
+    privilege_level character varying(16) NOT NULL,
+    country character varying(32) NOT NULL,
+    password_hash bytea NOT NULL,
+    disabled boolean DEFAULT false NOT NULL
+);
+
+
+ALTER TABLE public.users OWNER TO postgres;
+
+--
+-- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.users_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.users_id_seq OWNER TO postgres;
+
+--
+-- Name: users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
+
+
+--
+-- Name: verification_keys; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.verification_keys (
+    id character varying(50) NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    user_id integer NOT NULL,
+    used boolean DEFAULT false,
+    type character varying(16) NOT NULL
+);
+
+
+ALTER TABLE public.verification_keys OWNER TO postgres;
+
+--
+-- Name: book_logs id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.book_logs ALTER COLUMN id SET DEFAULT nextval('public.book_logs_id_seq'::regclass);
+
+
+--
+-- Name: school_contacts id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.school_contacts ALTER COLUMN id SET DEFAULT nextval('public.school_contacts_id_seq'::regclass);
+
+
+--
+-- Name: school_reports_with_libraries id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.school_reports_with_libraries ALTER COLUMN id SET DEFAULT nextval('public.school_reports_with_libraries_id_seq'::regclass);
+
+
+--
+-- Name: school_reports_without_libraries id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.school_reports_without_libraries ALTER COLUMN id SET DEFAULT nextval('public.school_reports_without_libraries_id_seq'::regclass);
+
+
+--
+-- Name: schools id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.schools ALTER COLUMN id SET DEFAULT nextval('public.schools_id_seq'::regclass);
+
+
+--
+-- Name: users id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_id_seq'::regclass);
+
+
+--
+-- Data for Name: blacklisted_refreshes; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.blacklisted_refreshes (refresh_hash, created_at, updated_at, expires) FROM stdin;
+DMtMH5MuaF29m6JxG43CHfDNvBUkKO22QsIqTYcULtE	2021-05-11 16:27:00.773	2021-05-11 16:27:00.773	2021-05-18 16:27:00.771
+-8NrZE5q86CwjK9xuutAuV0ymhrs0pqkk1ZlB-EgUi4	2021-05-11 17:11:56.571	2021-05-11 17:11:56.571	2021-05-18 17:11:56.57
+pPmYUbDb07x5VAnJGe1DJiQjHSIk30SZ6pGvroPPEuA	2021-05-11 18:31:46.493	2021-05-11 18:31:46.493	2021-05-18 18:31:46.491
+Lj7kGb9N6AFEmL_QQkGVn1dhQORGasGyCYyhU02czTM	2021-05-11 18:34:41.605	2021-05-11 18:34:41.605	2021-05-18 18:34:41.605
+_yPENeb4RJ1zPbBOXkr8LI4vBWNaz2QjlU1OdZT812E	2021-05-11 18:35:46.923	2021-05-11 18:35:46.923	2021-05-18 18:35:46.923
+-_H7wUtF0YpLTEVCsczpJYSiLaZfKVNUzjcsk2xm0Jc	2021-05-11 18:36:51.523	2021-05-11 18:36:51.523	2021-05-18 18:36:51.523
+CzGCEw8U8h3mybLfRq6FMscV3GySI8UTnPCtH7JugOA	2021-05-11 18:41:56.782	2021-05-11 18:41:56.782	2021-05-18 18:41:56.782
+F30HN6Wy5V4ieiAIkQVZ92gcid_5N5SGN4Uu8YMHJLs	2021-05-25 19:37:39.44	2021-05-25 19:37:39.44	2021-06-01 19:37:39.434
+5zSCOJ9PProFFh7gLRMyWFUsL_iG424gHZP_xpRWLXE	2021-05-26 23:43:37.642	2021-05-26 23:43:37.642	2021-06-02 23:43:37.642
+MzC2CTomm_LnwBvZYm1g0qO9gp5muso8ofx3slwXme8	2021-05-27 16:33:48.274	2021-05-27 16:33:48.274	2021-06-03 16:33:48.274
+yUlYKZKvIoJZ-lfa0mqaiejWjUR7OyXSB0Z7KFSEGNo	2021-05-27 16:34:47.359	2021-05-27 16:34:47.359	2021-06-03 16:34:47.359
+u83_E0kS21Orh9S1vdhtBLZBRwGqc-N7Y71dIm4SXd4	2021-05-27 16:35:37.393	2021-05-27 16:35:37.393	2021-06-03 16:35:37.393
+9EaxNKvbkE6VcsoqUfsxfjJueFhjmSKCd1-Ja1LyuQQ	2021-05-27 17:52:09.516	2021-05-27 17:52:09.516	2021-06-03 17:52:09.401
+vPvjrFrjcLJH4gDcnsbgUncTt32A0uBxq56PDgnW-Ko	2021-05-27 18:15:17.791	2021-05-27 18:15:17.791	2021-06-03 18:15:17.791
+zmR7ZV2QBOukkoflQIouRAiXopizB8xNYmVXrcmonMo	2021-05-27 18:16:29.242	2021-05-27 18:16:29.242	2021-06-03 18:16:29.242
+EfqJ2Izq7sQsZ4IOZS3HuTWy3wpBsh9ST-RH_I7tZN8	2021-05-27 18:16:37.257	2021-05-27 18:16:37.257	2021-06-03 18:16:37.257
+bO8FSxlDYYDooCVaa6b3nmVMdyNLq7zLggHTgjHZz7c	2021-05-27 18:40:54.128	2021-05-27 18:40:54.128	2021-06-03 18:40:54.128
+CIk3OpNH17OBCo2YsIJkeSDkMi5aykWsBCZ7QvDWXdI	2021-05-27 18:42:22.209	2021-05-27 18:42:22.209	2021-06-03 18:42:22.209
+yy2SxgbePJsKTrZlP3JkDD0fntBPW0mEwAcsv4dCBxo	2021-05-27 18:42:56.735	2021-05-27 18:42:56.735	2021-06-03 18:42:56.735
+Olgi6GosfJagP0WquLIHGNeAFMCPbHIHZG0uHi2yNZA	2021-05-27 18:43:47.296	2021-05-27 18:43:47.296	2021-06-03 18:43:47.296
+aH7d54uKvX8hGsu4d7EtSJMLhjybf3SdX4364Cv699E	2021-05-27 18:52:33.694	2021-05-27 18:52:33.694	2021-06-03 18:52:33.694
+zDm2xpjZ2FerobOwynlTHBH1PhAgkdCWixgZZzvHBcg	2021-05-27 18:57:32.195	2021-05-27 18:57:32.195	2021-06-03 18:57:32.195
+sDzgH7Nqfmu0Ej97GAf1gNaVwIa13_dmzRwxXTF4vmg	2021-05-27 19:40:46.057	2021-05-27 19:40:46.057	2021-06-03 19:40:46.057
+17YoaP28oS_TiFoRFDk27OMpXH8rmaYTsaYYS96lgZE	2021-05-27 19:44:55.15	2021-05-27 19:44:55.15	2021-06-03 19:44:55.15
+trthpJBOUAFBbwleGw_wyRA6sMWE0pLvMPM7QE_Kapk	2021-05-27 20:00:35.273	2021-05-27 20:00:35.273	2021-06-03 20:00:35.273
+S9siE8b3TMi99k4rg0RoTbMHk2t_gLGYqWVymzp9Utw	2021-05-27 20:01:24.837	2021-05-27 20:01:24.837	2021-06-03 20:01:24.837
+b21_zW0ckXpUhyIVK_g6nylJYE8ki1pfMsRQz61R3Xs	2021-05-27 20:09:55.686	2021-05-27 20:09:55.686	2021-06-03 20:09:55.685
+6DxT16B6ITfgSLN43uyVaUin8JaExMz5Q6bhaXo5T-Q	2021-05-27 20:15:22.934	2021-05-27 20:15:22.934	2021-06-03 20:15:22.934
+tvIDp1cNBrbna4mmNAgfyx8WtuD3lKstrZJGfPsCerM	2021-05-27 20:31:59.288	2021-05-27 20:31:59.288	2021-06-03 20:31:59.288
+KhNT1JF1Hn6ZYDsOK65Vr4oXQtzbGd61mOU-QUtErnA	2021-05-27 20:34:41.737	2021-05-27 20:34:41.737	2021-06-03 20:34:41.737
+KJZ2oBOjY5m_HT6IPVvCyEb5VqgHcitEZvpJ_42Q0mQ	2021-05-27 20:41:17.141	2021-05-27 20:41:17.141	2021-06-03 20:41:17.141
+Hbdm4Xg6haWH8Dhj8hWpex06Kw7jq7GasBT8QVpLWn4	2021-05-27 20:41:30.733	2021-05-27 20:41:30.733	2021-06-03 20:41:30.733
+FvHuf1pSgdn85fDKD3tci9aH01D1XvnYFU5D4eopmgM	2021-05-27 20:42:18.096	2021-05-27 20:42:18.096	2021-06-03 20:42:18.096
+X9caJTGY3nGhrlqxvX6cOyQL_bzTNAzZ8zt_zCAabSQ	2021-05-27 20:42:59.482	2021-05-27 20:42:59.482	2021-06-03 20:42:59.482
+XICKdOt8QyJrJrTah372J-DnDpILCFHtfM3Y2ez6qtk	2021-05-27 20:43:51.887	2021-05-27 20:43:51.887	2021-06-03 20:43:51.887
+G5b3tRn-mugpUOG9ZQ8OJ1SM1PukewjhLjhfnzq-wG4	2021-05-27 20:44:13.568	2021-05-27 20:44:13.568	2021-06-03 20:44:13.568
+mQ8S7o98y_FOv2qdBX2jhnHRTR9emifuO6fJd9ofS7M	2021-05-27 20:44:51.581	2021-05-27 20:44:51.581	2021-06-03 20:44:51.581
+MGRb_OtDR63M83zTUbnxXmmUR8R8jnlnHLpA_vPEnco	2021-05-27 20:45:05.692	2021-05-27 20:45:05.692	2021-06-03 20:45:05.692
+odVWuxo2j5_4zKia51j52CrPRABxrVabMMZ1q5tkn1g	2021-05-27 20:50:26.35	2021-05-27 20:50:26.35	2021-06-03 20:50:26.35
+w4JDOWzoE37s6lmn-HlCqKuQ6OYFlj-u-6p_mclQvNA	2021-05-27 20:59:42.146	2021-05-27 20:59:42.146	2021-06-03 20:59:42.146
+7UWOJw2r4-C4b-3sRFUq0SmDInl9W2Ll3TNX9fv4Abo	2021-05-27 21:00:20.942	2021-05-27 21:00:20.942	2021-06-03 21:00:20.942
+_PXE_QIOwBJU1I-SeEsULwNRiTE9JpYbybcgK9HCMuk	2021-05-27 21:04:14.275	2021-05-27 21:04:14.275	2021-06-03 21:04:14.275
+Vw3uua5mZnXA_0fcD6Uh9oodw-2gO-0I762bE-3AC9I	2021-05-27 21:07:36.818	2021-05-27 21:07:36.818	2021-06-03 21:07:36.818
+vTSfsIDvQJigfT-LvCUEznQ3HLvtXBsw84tuOL2cEy0	2021-05-27 21:14:12.223	2021-05-27 21:14:12.223	2021-06-03 21:14:12.223
+1e2859H4BishP8yKU5LVjTA9CcjRnnZH0JflICmZbRY	2021-05-27 21:20:15.887	2021-05-27 21:20:15.887	2021-06-03 21:20:15.887
+bREjYgRCs3K22oZlvtfT_fu8PhlwzyngjO3q42ow57M	2021-05-27 21:23:42.396	2021-05-27 21:23:42.396	2021-06-03 21:23:42.396
+68lh6QY0907rct27uhOsUVvylDA3GHk-ltVZU0o0bfs	2021-05-27 21:24:32.689	2021-05-27 21:24:32.689	2021-06-03 21:24:32.689
+-baj7caodF5INLm8AHlggEQuAP4pw6j2lRj3YLlacnY	2021-05-27 21:26:53.407	2021-05-27 21:26:53.407	2021-06-03 21:26:53.407
+ZdzLfAZwYVIDcwuDmbLb0Jx7AfONx8lwRh8UJ_3XAxI	2021-05-27 21:33:06.048	2021-05-27 21:33:06.048	2021-06-03 21:33:06.048
+5R2FQLOx6zKMinhwbhaVgu0ace4h2Ajs2GP7xa5Sypc	2021-05-27 21:35:03.918	2021-05-27 21:35:03.918	2021-06-03 21:35:03.917
+WXvbUukuaBwnU1qGImaXD2ZmwmtRxX04wx6MLIpUpEE	2021-05-27 21:39:01.53	2021-05-27 21:39:01.53	2021-06-03 21:39:01.53
+W83P0nM4OqI7t_DmmAh05PsqoFSnXp3iZcs4VvQF8Hk	2021-05-27 22:41:23.582	2021-05-27 22:41:23.582	2021-06-03 22:41:23.582
+_I9-nc2VfQ_ONNd4X098hLFAzp-unln_0U3UeJHR61c	2021-06-13 20:39:00.783	2021-06-13 20:39:00.783	2021-06-20 20:39:00.67
+I1NCdk8k924fF38wiCZchLpDO99JCeZ5yw9OoLK5FF4	2021-06-15 18:13:53.931	2021-06-15 18:13:53.931	2021-06-22 18:13:53.931
+DYUoM0siSJhGTFDjh1IHHEEaX1NG0bttjc-RNXBND8c	2021-06-22 22:10:05.274	2021-06-22 22:10:05.274	2021-06-29 22:10:05.274
+7B6QpIkT2wT3tDuT-sNgzsj3qBhajdI_w6CHVedxMIk	2021-06-22 22:12:36.331	2021-06-22 22:12:36.331	2021-06-29 22:12:36.331
+qthiIj-iRxrafh36di3uagmnYHSpl5hDrnN_iI6wfxs	2021-06-22 22:17:30.482	2021-06-22 22:17:30.482	2021-06-29 22:17:30.482
+mNm1RSvaPkdUxvAoewnXgMKnpD4uQX_rLqSaK3YWMFk	2021-06-22 22:32:27.309	2021-06-22 22:32:27.309	2021-06-29 22:32:27.309
+N2K0l_7S5hX7QhgwWwtmnljp5WF9JjcLXcGvfqbSUXg	2021-06-29 22:34:41.812	2021-06-29 22:34:41.812	2021-07-06 22:34:41.796
+8cWWlhcvLeGqE8ocnacx7qNYhlNK5whJMLvovNPugUw	2021-07-11 22:16:15.03	2021-07-11 22:16:15.03	2021-07-18 22:16:14.93
+ty464jQbw6pBmoxaFzmlL0WBk4lZvUfsAzi-ZTpH2Is	2021-07-13 21:27:45.986	2021-07-13 21:27:45.986	2021-07-20 21:27:45.975
+IpXlhvbg2y2PGioWg6tlNXmbit1zuWNJCCjd41bCNMM	2021-07-13 22:26:45.539	2021-07-13 22:26:45.539	2021-07-20 22:26:45.539
+sL-LGwyTFGO_JgFKKXytFeyLQsujFfoDbX9FgjVAegM	2021-07-13 22:27:32.995	2021-07-13 22:27:32.995	2021-07-20 22:27:32.995
+V_E1YRvwxVWALQB7T8L0gSZvv3cwN-HVhfSkoxdtJTs	2021-07-18 00:07:11.421	2021-07-18 00:07:11.421	2021-07-25 00:07:11.311
+V278t_F5kbO5pJuYDHDCp_x-DEZ0Yc17EvMq-TUX6Go	2021-07-19 14:26:30.515	2021-07-19 14:26:30.515	2021-07-26 14:26:30.504
+ngC6F7dXble1F7ARXGJp2EkYMGlB2nRDRWdxtpsgGB8	2021-07-19 20:21:45.329	2021-07-19 20:21:45.329	2021-07-26 20:21:45.314
+sTmfqg7Y9My5BAIMq6OD_dFmf9sFsPEzBpLTrAWrYz8	2021-07-20 13:56:39.506	2021-07-20 13:56:39.506	2021-07-27 13:56:39.506
+0Mz1WE6wwdptN7y32J4C-ag_yq0ElmDBLqof7pRL9wA	2021-07-20 16:14:17.131	2021-07-20 16:14:17.131	2021-07-27 16:14:17.131
+h3r0oo_Af2k3wKAts2sPtIrFz8ue73WQNS6k9ZbXsjg	2021-07-20 17:12:11.192	2021-07-20 17:12:11.192	2021-07-27 17:12:11.192
+Y9s1tBDctk8Yyo-yr0JC19N0YnlLPNTNV983qt3yNZA	2021-07-20 17:13:05.753	2021-07-20 17:13:05.753	2021-07-27 17:13:05.753
+FOT5qrlzgk-N6KYapOy1Q6B_lRQda49GPMEe4MAg9UM	2021-07-20 18:41:37.289	2021-07-20 18:41:37.289	2021-07-27 18:41:37.289
+4jx3v1a9Fd6NTqRcLG61OFwulUEkTPXxN6yI9GmmBOo	2021-07-20 18:41:59.662	2021-07-20 18:41:59.662	2021-07-27 18:41:59.662
+fMvKBmzS4Ig5rSzZu-5gCwz0O0rORAQ4Cix29qhxbZU	2021-07-20 19:20:24.176	2021-07-20 19:20:24.176	2021-07-27 19:20:24.176
+22Zrj_ryDH6fW8h2c6Ij_Nh6PVj8hjVyunOoYJ5qup0	2021-07-20 19:46:11.64	2021-07-20 19:46:11.64	2021-07-27 19:46:11.64
+i6cH26UAixV4WmTO2D41vXTfge04pJzvhV1CWAiTz0M	2021-07-20 19:55:18.056	2021-07-20 19:55:18.056	2021-07-27 19:55:18.056
+sbuamO4rvd87YxjU0C7UwQvh_QR2NFneXFelD_69ZWM	2021-07-20 23:57:27.489	2021-07-20 23:57:27.489	2021-07-27 23:57:27.489
+S43kTK-HjnV8Ln5txVwXffBFBJF5YfA2QKOGnFd9NrY	2021-07-28 13:26:12.965	2021-07-28 13:26:12.965	2021-08-04 13:26:12.852
+OyeHiSp1cR8OtU66s-kpAKRAGR-WhH0qHmh_X7ZpBYA	2021-08-03 21:39:38.071	2021-08-03 21:39:38.071	2021-08-10 21:39:38.071
+Eq_EdqKynILKoVs2BC3DcacaU0nx9YLCsz_NxZ7glsI	2021-08-09 22:10:39.997	2021-08-09 22:10:39.997	2021-08-16 22:10:39.986
+-Chaz1EQZZ0skTeFSfYC9W4qsMcZzl6J2RahlrRAbFo	2021-08-10 21:28:13.888	2021-08-10 21:28:13.888	2021-08-17 21:28:13.777
+WDT30jLO4yH9JGDxvhF-2UyCbKZtew5c2dUIqKprKDk	2021-08-10 21:29:23.18	2021-08-10 21:29:23.18	2021-08-17 21:29:23.18
+JJanTvXHB0UmWH15BuL5h7rUbZaOtw6isK4tI1PE5xg	2021-08-10 22:41:51.583	2021-08-10 22:41:51.583	2021-08-17 22:41:51.583
+xD01r_dF_eERvtgkwGIEUvH0wUYOcDCtdBu1cItFrqs	2021-08-17 21:42:51.711	2021-08-17 21:42:51.711	2021-08-24 21:42:51.711
+NBaBb3ZIG0iWCZ0xgHwgoTFzLBA_Vly6QFVCA9hA8UI	2021-08-17 22:16:38.421	2021-08-17 22:16:38.421	2021-08-24 22:16:38.421
+sMfIc2PriLbHB1UVEaSdl4J0bi3s68VEgTy3H5cM5Po	2021-08-17 22:16:58.375	2021-08-17 22:16:58.375	2021-08-24 22:16:58.375
+WnZl6tWq1XdGoW3gf6p5ekmJhGv1db8uwSzSHD7d2Vo	2021-08-17 22:17:10.216	2021-08-17 22:17:10.216	2021-08-24 22:17:10.216
+xynQajgYpUcni1osga8K0TfKB_TlZRq0MuNY4WlyEEU	2021-08-27 21:15:25.015	2021-08-27 21:15:25.015	2021-09-03 21:15:25.014
+tMGiUbng0_1bzyTqmzoIqMJkfk0MmHzHhh8dP_oiQC0	2021-09-13 15:59:45.493	2021-09-13 15:59:45.493	2021-09-20 15:59:45.471
+abjhiYKzY-ItP1TBSMs72F66xRlbzKFcaYn7-JtBdIg	2021-09-15 23:01:42.691	2021-09-15 23:01:42.691	2021-09-22 23:01:42.691
+3aa2-r2tEmedfqnN5vhz3CLNIZqjBPjWVNE0-F3Qs8Y	2021-09-30 22:03:41.184	2021-09-30 22:03:41.184	2021-10-07 22:03:41.174
+5-4xYH7rslhNt_THRrOvFD4c9wuxNmM4O0ugEtIEhyA	2021-10-19 16:13:28.42	2021-10-19 16:13:28.42	2021-10-26 16:13:28.31
+6J2l0D8uYwnODXjbmMnEXhBd4Ab0-_iAFM1kk-RFOGs	2021-10-31 18:08:43.786	2021-10-31 18:08:43.786	2021-11-07 18:08:43.78
+GufeeXeKxZh29ypuBOBFUQTNcBqumjkjIPZ61kaYRHM	2021-11-10 14:28:22.546	2021-11-10 14:28:22.546	2021-11-17 14:28:22.546
+wLU4j969sFk_3KuhXvBQ49dFTWHHIUKnnmkB8I4mhg0	2021-11-10 14:28:53.129	2021-11-10 14:28:53.129	2021-11-17 14:28:53.129
+00xn8y29cvxDL5g7dDjg2wmOHagaMTq-FFqSLjwkmoA	2022-01-07 17:03:21.053	2022-01-07 17:03:21.053	2022-01-14 17:03:21.047
+l1ADY7AdiRHv6-IWYUKO6o769-z8dz6bFnIG8w_tA18	2022-01-07 17:17:39.866	2022-01-07 17:17:39.866	2022-01-14 17:17:39.866
+dJncPQjwA8qYGN3y3nDArOuvwrWtLyDX6d6SC0coD_4	2022-01-07 17:18:30.702	2022-01-07 17:18:30.702	2022-01-14 17:18:30.702
+1BCgR9ZTmY7XthnWPA3HY9ijt8vMKgKKFtUenrPIrbg	2022-01-07 17:18:36.892	2022-01-07 17:18:36.892	2022-01-14 17:18:36.892
+KsULDh84Zrl2RIcpqaB4vE1LaH0yUbEHeI_SKsFXwl4	2022-01-07 17:19:00.54	2022-01-07 17:19:00.54	2022-01-14 17:19:00.54
+uPTwO_YTG7RtRfFe0cjTL3QCuOA0Y9lUwBz1bwhL3Qo	2022-01-21 17:45:47.878	2022-01-21 17:45:47.878	2022-01-28 17:45:47.878
+gQpJEmdFJ4HYOPXPJKN8HwDpGZuXqzPg6O82xQ3spyE	2022-01-23 18:15:24.972	2022-01-23 18:15:24.972	2022-01-30 18:15:24.808
+P75Yq01vFjSu-wEyehf98x-m3ehcnMO-_7Hd7NY4vko	2022-01-23 18:59:48.897	2022-01-23 18:59:48.897	2022-01-30 18:59:48.897
+DiTq3SbQpVlXt4b-5qS9582m7VZzq2q_LRESvth0JTc	2022-02-25 17:43:27.39	2022-02-25 17:43:27.39	2022-03-04 17:43:27.196
+jiOskeqryoWX0fmL-7w1XdLmfKDqJx1hcceKh9oj3sg	2022-02-25 17:44:26.61	2022-02-25 17:44:26.61	2022-03-04 17:44:26.61
+IFzYWD3tFs1Sb0XFH59w4qSA_R41xDkmLVSAozQx4Lk	2022-02-27 20:08:55.497	2022-02-27 20:08:55.497	2022-03-06 20:08:55.497
+fpB1C7njHqEyUj_tPIdnbn8dLdnKQMlaGKa7Hav4HZ8	2022-03-31 04:13:15.345	2022-03-31 04:13:15.345	2022-04-07 04:13:15.338
+as4JNEqvF6_HzjFo9-sJm0NYxdeN3oBNnWgOzh042Go	2022-03-31 23:49:17.029	2022-03-31 23:49:17.029	2022-04-07 23:49:17.029
+g8OwY6tO7s1hp4iCNOYpE2sHxeVCu-UJtmJcKwqaE18	2022-04-01 16:20:06.439	2022-04-01 16:20:06.439	2022-04-08 16:20:06.439
+LT_Udx7D6v5E1rEg3EFfQAW5Jixp2NY1ICfIlRvhNDE	2022-04-01 16:32:42.951	2022-04-01 16:32:42.951	2022-04-08 16:32:42.951
+Fpzvh-jiVAOnNQhEu0aremO6KMp0VnN5OfXPSNtx3og	2022-04-01 16:37:33.423	2022-04-01 16:37:33.423	2022-04-08 16:37:33.423
+YAwYG-PRPPmQlvOiiVc4rOIumBIbmee97GDaC5jHwrY	2022-04-01 16:37:57.9	2022-04-01 16:37:57.9	2022-04-08 16:37:57.9
+H1p_7AJqB2nsrEf6r_v8JTi1BxRC3CSsM-O51vX_2Bk	2022-04-02 22:56:35.44	2022-04-02 22:56:35.44	2022-04-09 22:56:35.434
+vrEf8AUYlZIoQHLoNJyBFP3exD4LAGovqojGIREgIrc	2022-04-02 23:40:39.256	2022-04-02 23:40:39.256	2022-04-09 23:40:39.249
+sM1__59DEAfs5ItMpeOOPf74NOxdujlpy8Z5blzmAa4	2022-04-02 23:41:21.727	2022-04-02 23:41:21.727	2022-04-09 23:41:21.727
+H6JTPp9B4_ikFW6YGZ2EuLIelrOIWdN_6VuqGKDtlLU	2022-04-02 23:44:25.744	2022-04-02 23:44:25.744	2022-04-09 23:44:25.744
+LlBzj-o9C8WoY5He-d-mZUcfk51kOqdomQGaPYu2_UM	2022-04-03 18:34:01.926	2022-04-03 18:34:01.926	2022-04-10 18:34:01.925
+lV0lXNaKrb9ai4d3Pu4-tazLdNyZydxwolcIXvmZcXg	2022-04-03 18:52:35.997	2022-04-03 18:52:35.997	2022-04-10 18:52:35.997
+XspyLkxTGixxrdKmb67nmtNgpHCnuX3nh3QSVHkV2dw	2022-04-05 16:13:36.243	2022-04-05 16:13:36.243	2022-04-12 16:13:36.142
+paMCLdgCQelmcCo-rd1x943cr--IkGkdtPqBjQ4UAn8	2022-04-07 19:30:31.371	2022-04-07 19:30:31.371	2022-04-14 19:30:31.371
+QNvM8oyNWMB8cJYlpUYliKaLUl7NA2t_Iymw7jxdWgc	2022-04-07 19:30:58.042	2022-04-07 19:30:58.042	2022-04-14 19:30:58.042
+GRtfSqrbRhCh6cffdIUzy-bBHwwwGMG-ZcEysBqosoY	2022-04-07 19:32:33.617	2022-04-07 19:32:33.617	2022-04-14 19:32:33.616
+v-wl__UUxv-5CPv5_uGW3pW-K57Z4fQtF2L3azunBAY	2022-04-07 19:32:54.416	2022-04-07 19:32:54.416	2022-04-14 19:32:54.416
+_QX42Hmcht57zsHayLQovnW0BxvLd0QnQXA4lqn4KQM	2022-04-08 13:26:47.325	2022-04-08 13:26:47.325	2022-04-15 13:26:47.311
+LN2B_CX4wOBoqMl-8nziOnyrPuf5dj02nA4-UB8uixU	2022-04-08 14:39:17.322	2022-04-08 14:39:17.322	2022-04-15 14:39:17.322
+gAyzJmH-i3i83I2QCHPDICv-5bcOTYyq7NFaXaL1-pw	2022-04-08 14:51:31.833	2022-04-08 14:51:31.833	2022-04-15 14:51:31.833
+X6yFrOTp9Msf0hIUPmXv-_6naa3PQ4DtYfYcLl8Jzdk	2022-04-08 14:55:07.539	2022-04-08 14:55:07.539	2022-04-15 14:55:07.539
+wjmkHpasAsYpNqHhbWZ2gRhaAZ9oJEuINxmHoxD6fPc	2022-04-08 15:19:01.825	2022-04-08 15:19:01.825	2022-04-15 15:19:01.825
+\.
+
+
+--
+-- Data for Name: book_logs; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.book_logs (id, created_at, updated_at, deleted_at, school_id, count, date, notes) FROM stdin;
+2000	2022-03-31 04:09:14.583756	2022-03-31 04:09:14.583756	\N	519	300	2014-01-01 00:00:00	Old Data Migration.
+2001	2022-03-31 04:09:14.818381	2022-03-31 04:09:14.818381	\N	519	331	2018-01-01 00:00:00	Old Data Migration.
+2002	2022-03-31 04:09:15.025518	2022-03-31 04:09:15.025518	\N	520	75	2014-01-01 00:00:00	Old Data Migration.
+2003	2022-03-31 04:09:15.227457	2022-03-31 04:09:15.227457	\N	520	154	2021-09-01 00:00:00	Old Data Migration.
+2004	2022-03-31 04:09:15.439339	2022-03-31 04:09:15.439339	\N	521	867	2020-01-01 00:00:00	Old Data Migration.
+2005	2022-03-31 04:09:15.656995	2022-03-31 04:09:15.656995	\N	522	436	2015-01-01 00:00:00	Old Data Migration.
+2006	2022-03-31 04:09:15.854916	2022-03-31 04:09:15.854916	\N	522	754	2019-01-01 00:00:00	Old Data Migration.
+2007	2022-03-31 04:09:16.066035	2022-03-31 04:09:16.066035	\N	523	185	2016-01-01 00:00:00	Old Data Migration.
+2008	2022-03-31 04:09:16.276761	2022-03-31 04:09:16.276761	\N	524	829	2019-01-01 00:00:00	Old Data Migration.
+2009	2022-03-31 04:09:16.480127	2022-03-31 04:09:16.480127	\N	524	107	2020-01-01 00:00:00	Old Data Migration.
+2010	2022-03-31 04:09:16.681948	2022-03-31 04:09:16.681948	\N	524	47	2021-09-01 00:00:00	Old Data Migration.
+2011	2022-03-31 04:09:16.88088	2022-03-31 04:09:16.88088	\N	525	800	2012-01-01 00:00:00	Old Data Migration.
+2012	2022-03-31 04:09:17.088827	2022-03-31 04:09:17.088827	\N	525	75	2014-01-01 00:00:00	Old Data Migration.
+2013	2022-03-31 04:09:17.293356	2022-03-31 04:09:17.293356	\N	525	310	2017-01-01 00:00:00	Old Data Migration.
+2014	2022-03-31 04:09:17.495261	2022-03-31 04:09:17.495261	\N	525	612	2019-01-01 00:00:00	Old Data Migration.
+2015	2022-03-31 04:09:17.699706	2022-03-31 04:09:17.699706	\N	525	47	2021-09-01 00:00:00	Old Data Migration.
+2016	2022-03-31 04:09:17.908656	2022-03-31 04:09:17.908656	\N	526	600	2013-01-01 00:00:00	Old Data Migration.
+2017	2022-03-31 04:09:18.115212	2022-03-31 04:09:18.115212	\N	526	150	2014-01-01 00:00:00	Old Data Migration.
+2018	2022-03-31 04:09:18.315255	2022-03-31 04:09:18.315255	\N	526	354	2018-01-01 00:00:00	Old Data Migration.
+2019	2022-03-31 04:09:18.682864	2022-03-31 04:09:18.682864	\N	526	232	2019-01-01 00:00:00	Old Data Migration.
+2020	2022-03-31 04:09:18.891969	2022-03-31 04:09:18.891969	\N	526	177	2021-01-01 00:00:00	Old Data Migration.
+2021	2022-03-31 04:09:19.093746	2022-03-31 04:09:19.093746	\N	527	1389	2018-01-01 00:00:00	Old Data Migration.
+2022	2022-03-31 04:09:19.293152	2022-03-31 04:09:19.293152	\N	528	100	2012-01-01 00:00:00	Old Data Migration.
+2023	2022-03-31 04:09:19.491121	2022-03-31 04:09:19.491121	\N	529	150	2014-01-01 00:00:00	Old Data Migration.
+2024	2022-03-31 04:09:19.698518	2022-03-31 04:09:19.698518	\N	529	367	2015-01-01 00:00:00	Old Data Migration.
+2025	2022-03-31 04:09:19.894472	2022-03-31 04:09:19.894472	\N	529	271	2016-01-01 00:00:00	Old Data Migration.
+2026	2022-03-31 04:09:20.098592	2022-03-31 04:09:20.098592	\N	529	426	2017-01-01 00:00:00	Old Data Migration.
+2027	2022-03-31 04:09:20.664042	2022-03-31 04:09:20.664042	\N	529	1913	2018-01-01 00:00:00	Old Data Migration.
+2028	2022-03-31 04:09:20.921956	2022-03-31 04:09:20.921956	\N	529	228	2019-01-01 00:00:00	Old Data Migration.
+2029	2022-03-31 04:09:21.115252	2022-03-31 04:09:21.115252	\N	529	47	2021-09-01 00:00:00	Old Data Migration.
+2030	2022-03-31 04:09:21.319328	2022-03-31 04:09:21.319328	\N	530	366	2015-01-01 00:00:00	Old Data Migration.
+2031	2022-03-31 04:09:21.532826	2022-03-31 04:09:21.532826	\N	531	481	2017-01-01 00:00:00	Old Data Migration.
+2032	2022-03-31 04:09:21.740703	2022-03-31 04:09:21.740703	\N	531	973	2019-01-01 00:00:00	Old Data Migration.
+2033	2022-03-31 04:09:21.975354	2022-03-31 04:09:21.975354	\N	531	47	2021-09-01 00:00:00	Old Data Migration.
+2034	2022-03-31 04:09:22.167428	2022-03-31 04:09:22.167428	\N	532	317	2015-01-01 00:00:00	Old Data Migration.
+2035	2022-03-31 04:09:22.371045	2022-03-31 04:09:22.371045	\N	532	235	2016-01-01 00:00:00	Old Data Migration.
+2036	2022-03-31 04:09:22.559903	2022-03-31 04:09:22.559903	\N	532	246	2017-01-01 00:00:00	Old Data Migration.
+2037	2022-03-31 04:09:22.94881	2022-03-31 04:09:22.94881	\N	532	285	2018-01-01 00:00:00	Old Data Migration.
+2038	2022-03-31 04:09:23.178393	2022-03-31 04:09:23.178393	\N	533	593	2017-01-01 00:00:00	Old Data Migration.
+2039	2022-03-31 04:09:23.370084	2022-03-31 04:09:23.370084	\N	533	1878	2018-01-01 00:00:00	Old Data Migration.
+2040	2022-03-31 04:09:23.575008	2022-03-31 04:09:23.575008	\N	533	90	2019-01-01 00:00:00	Old Data Migration.
+2041	2022-03-31 04:09:23.773034	2022-03-31 04:09:23.773034	\N	534	498	2016-01-01 00:00:00	Old Data Migration.
+2042	2022-03-31 04:09:23.970188	2022-03-31 04:09:23.970188	\N	535	1187	2020-01-01 00:00:00	Old Data Migration.
+2043	2022-03-31 04:09:24.161421	2022-03-31 04:09:24.161421	\N	536	300	2013-01-01 00:00:00	Old Data Migration.
+2044	2022-03-31 04:09:24.360833	2022-03-31 04:09:24.360833	\N	536	150	2014-01-01 00:00:00	Old Data Migration.
+2045	2022-03-31 04:09:24.567184	2022-03-31 04:09:24.567184	\N	536	191	2016-01-01 00:00:00	Old Data Migration.
+2046	2022-03-31 04:09:24.76028	2022-03-31 04:09:24.76028	\N	536	267	2017-01-01 00:00:00	Old Data Migration.
+2047	2022-03-31 04:09:24.959698	2022-03-31 04:09:24.959698	\N	537	439	2016-01-01 00:00:00	Old Data Migration.
+2048	2022-03-31 04:09:25.1599	2022-03-31 04:09:25.1599	\N	537	493	2017-01-01 00:00:00	Old Data Migration.
+2049	2022-03-31 04:09:25.378316	2022-03-31 04:09:25.378316	\N	537	1041	2018-01-01 00:00:00	Old Data Migration.
+2050	2022-03-31 04:09:25.582759	2022-03-31 04:09:25.582759	\N	537	141	2020-01-01 00:00:00	Old Data Migration.
+2051	2022-03-31 04:09:25.776649	2022-03-31 04:09:25.776649	\N	538	525	2014-01-01 00:00:00	Old Data Migration.
+2052	2022-03-31 04:09:25.972806	2022-03-31 04:09:25.972806	\N	538	154	2021-09-01 00:00:00	Old Data Migration.
+2053	2022-03-31 04:09:26.171058	2022-03-31 04:09:26.171058	\N	539	599	2017-01-01 00:00:00	Old Data Migration.
+2054	2022-03-31 04:09:26.363591	2022-03-31 04:09:26.363591	\N	539	1902	2018-01-01 00:00:00	Old Data Migration.
+2055	2022-03-31 04:09:26.566103	2022-03-31 04:09:26.566103	\N	539	215	2020-01-01 00:00:00	Old Data Migration.
+2056	2022-03-31 04:09:26.777308	2022-03-31 04:09:26.777308	\N	540	450	2013-01-01 00:00:00	Old Data Migration.
+2057	2022-03-31 04:09:26.980495	2022-03-31 04:09:26.980495	\N	540	150	2014-01-01 00:00:00	Old Data Migration.
+2058	2022-03-31 04:09:27.178746	2022-03-31 04:09:27.178746	\N	540	374	2017-01-01 00:00:00	Old Data Migration.
+2059	2022-03-31 04:09:27.372242	2022-03-31 04:09:27.372242	\N	541	2800	2011-01-01 00:00:00	Old Data Migration.
+2060	2022-03-31 04:09:27.573582	2022-03-31 04:09:27.573582	\N	541	100	2012-01-01 00:00:00	Old Data Migration.
+2061	2022-03-31 04:09:27.766554	2022-03-31 04:09:27.766554	\N	541	455	2015-01-01 00:00:00	Old Data Migration.
+2062	2022-03-31 04:09:27.975631	2022-03-31 04:09:27.975631	\N	541	367	2016-01-01 00:00:00	Old Data Migration.
+2063	2022-03-31 04:09:28.306318	2022-03-31 04:09:28.306318	\N	541	1052	2018-01-01 00:00:00	Old Data Migration.
+2064	2022-03-31 04:09:28.791344	2022-03-31 04:09:28.791344	\N	541	579	2020-01-01 00:00:00	Old Data Migration.
+2065	2022-03-31 04:09:29.058068	2022-03-31 04:09:29.058068	\N	542	300	2014-01-01 00:00:00	Old Data Migration.
+2066	2022-03-31 04:09:30.30724	2022-03-31 04:09:30.30724	\N	542	294	2015-01-01 00:00:00	Old Data Migration.
+2067	2022-03-31 04:09:30.512405	2022-03-31 04:09:30.512405	\N	542	582	2017-01-01 00:00:00	Old Data Migration.
+2068	2022-03-31 04:09:30.704849	2022-03-31 04:09:30.704849	\N	542	791	2019-01-01 00:00:00	Old Data Migration.
+2069	2022-03-31 04:09:30.907379	2022-03-31 04:09:30.907379	\N	543	1974	2018-01-01 00:00:00	Old Data Migration.
+2070	2022-03-31 04:09:31.107726	2022-03-31 04:09:31.107726	\N	543	158	2019-01-01 00:00:00	Old Data Migration.
+2071	2022-03-31 04:09:31.30597	2022-03-31 04:09:31.30597	\N	543	47	2021-09-01 00:00:00	Old Data Migration.
+2072	2022-03-31 04:09:31.513025	2022-03-31 04:09:31.513025	\N	544	500	2013-01-01 00:00:00	Old Data Migration.
+2073	2022-03-31 04:09:31.706698	2022-03-31 04:09:31.706698	\N	544	150	2014-01-01 00:00:00	Old Data Migration.
+2074	2022-03-31 04:09:31.909882	2022-03-31 04:09:31.909882	\N	544	453	2015-01-01 00:00:00	Old Data Migration.
+2075	2022-03-31 04:09:32.112981	2022-03-31 04:09:32.112981	\N	544	203	2021-09-01 00:00:00	Old Data Migration.
+2076	2022-03-31 04:09:32.416295	2022-03-31 04:09:32.416295	\N	545	368	2017-01-01 00:00:00	Old Data Migration.
+2077	2022-03-31 04:09:32.621149	2022-03-31 04:09:32.621149	\N	546	300	2014-01-01 00:00:00	Old Data Migration.
+2078	2022-03-31 04:09:32.815838	2022-03-31 04:09:32.815838	\N	546	398	2015-01-01 00:00:00	Old Data Migration.
+2079	2022-03-31 04:09:33.038351	2022-03-31 04:09:33.038351	\N	546	425	2016-01-01 00:00:00	Old Data Migration.
+2080	2022-03-31 04:09:33.425988	2022-03-31 04:09:33.425988	\N	547	800	2012-01-01 00:00:00	Old Data Migration.
+2081	2022-03-31 04:09:33.966699	2022-03-31 04:09:33.966699	\N	547	900	2013-01-01 00:00:00	Old Data Migration.
+2082	2022-03-31 04:09:34.187805	2022-03-31 04:09:34.187805	\N	547	213	2017-01-01 00:00:00	Old Data Migration.
+2083	2022-03-31 04:09:34.388564	2022-03-31 04:09:34.388564	\N	547	697	2019-01-01 00:00:00	Old Data Migration.
+2084	2022-03-31 04:09:34.821892	2022-03-31 04:09:34.821892	\N	548	150	2014-01-01 00:00:00	Old Data Migration.
+2085	2022-03-31 04:09:35.035312	2022-03-31 04:09:35.035312	\N	548	597	2019-01-01 00:00:00	Old Data Migration.
+2086	2022-03-31 04:09:35.55821	2022-03-31 04:09:35.55821	\N	548	302	2020-01-01 00:00:00	Old Data Migration.
+2087	2022-03-31 04:09:36.400768	2022-03-31 04:09:36.400768	\N	548	736	2021-01-01 00:00:00	Old Data Migration.
+2088	2022-03-31 04:09:37.029949	2022-03-31 04:09:37.029949	\N	548	40	2021-09-01 00:00:00	Old Data Migration.
+2089	2022-03-31 04:09:37.497092	2022-03-31 04:09:37.497092	\N	549	501	2016-01-01 00:00:00	Old Data Migration.
+2090	2022-03-31 04:09:37.78184	2022-03-31 04:09:37.78184	\N	549	519	2020-01-01 00:00:00	Old Data Migration.
+2091	2022-03-31 04:09:37.987257	2022-03-31 04:09:37.987257	\N	549	392	2021-01-01 00:00:00	Old Data Migration.
+2092	2022-03-31 04:09:38.393369	2022-03-31 04:09:38.393369	\N	550	374	2015-01-01 00:00:00	Old Data Migration.
+2093	2022-03-31 04:09:38.588012	2022-03-31 04:09:38.588012	\N	550	263	2016-01-01 00:00:00	Old Data Migration.
+2094	2022-03-31 04:09:38.799038	2022-03-31 04:09:38.799038	\N	550	154	2021-09-01 00:00:00	Old Data Migration.
+2095	2022-03-31 04:09:38.994234	2022-03-31 04:09:38.994234	\N	551	448	2016-01-01 00:00:00	Old Data Migration.
+2096	2022-03-31 04:09:39.191024	2022-03-31 04:09:39.191024	\N	552	614	2017-01-01 00:00:00	Old Data Migration.
+2097	2022-03-31 04:09:39.4001	2022-03-31 04:09:39.4001	\N	552	1528	2018-01-01 00:00:00	Old Data Migration.
+2098	2022-03-31 04:09:39.604932	2022-03-31 04:09:39.604932	\N	553	443	2017-01-01 00:00:00	Old Data Migration.
+2099	2022-03-31 04:09:39.809994	2022-03-31 04:09:39.809994	\N	553	338	2018-01-01 00:00:00	Old Data Migration.
+2100	2022-03-31 04:09:40.031145	2022-03-31 04:09:40.031145	\N	554	75	2014-01-01 00:00:00	Old Data Migration.
+2101	2022-03-31 04:09:40.246306	2022-03-31 04:09:40.246306	\N	555	1481	2018-01-01 00:00:00	Old Data Migration.
+2102	2022-03-31 04:09:40.437967	2022-03-31 04:09:40.437967	\N	556	225	2014-01-01 00:00:00	Old Data Migration.
+2103	2022-03-31 04:09:40.623405	2022-03-31 04:09:40.623405	\N	556	454	2015-01-01 00:00:00	Old Data Migration.
+2104	2022-03-31 04:09:40.830355	2022-03-31 04:09:40.830355	\N	556	1045	2019-01-01 00:00:00	Old Data Migration.
+2105	2022-03-31 04:09:41.054362	2022-03-31 04:09:41.054362	\N	557	450	2013-01-01 00:00:00	Old Data Migration.
+2106	2022-03-31 04:09:41.252505	2022-03-31 04:09:41.252505	\N	557	150	2014-01-01 00:00:00	Old Data Migration.
+2107	2022-03-31 04:09:41.456961	2022-03-31 04:09:41.456961	\N	558	100	2011-01-01 00:00:00	Old Data Migration.
+2108	2022-03-31 04:09:41.673478	2022-03-31 04:09:41.673478	\N	558	800	2012-01-01 00:00:00	Old Data Migration.
+2109	2022-03-31 04:09:41.892173	2022-03-31 04:09:41.892173	\N	558	1000	2013-01-01 00:00:00	Old Data Migration.
+2110	2022-03-31 04:09:42.097074	2022-03-31 04:09:42.097074	\N	558	342	2017-01-01 00:00:00	Old Data Migration.
+2111	2022-03-31 04:09:42.327636	2022-03-31 04:09:42.327636	\N	558	40	2021-09-01 00:00:00	Old Data Migration.
+2112	2022-03-31 04:09:42.545806	2022-03-31 04:09:42.545806	\N	559	291	2016-01-01 00:00:00	Old Data Migration.
+2113	2022-03-31 04:09:43.760472	2022-03-31 04:09:43.760472	\N	562	150	2012-01-01 00:00:00	Old Data Migration.
+2114	2022-03-31 04:09:43.97783	2022-03-31 04:09:43.97783	\N	563	451	2017-01-01 00:00:00	Old Data Migration.
+2115	2022-03-31 04:09:44.540742	2022-03-31 04:09:44.540742	\N	563	1459	2019-01-01 00:00:00	Old Data Migration.
+2116	2022-03-31 04:09:44.821531	2022-03-31 04:09:44.821531	\N	564	464	2017-01-01 00:00:00	Old Data Migration.
+2117	2022-03-31 04:09:45.369529	2022-03-31 04:09:45.369529	\N	564	694	2019-01-01 00:00:00	Old Data Migration.
+2118	2022-03-31 04:09:45.574335	2022-03-31 04:09:45.574335	\N	565	845	2019-01-01 00:00:00	Old Data Migration.
+2119	2022-03-31 04:09:45.783406	2022-03-31 04:09:45.783406	\N	566	200	2011-01-01 00:00:00	Old Data Migration.
+2120	2022-03-31 04:09:46.002481	2022-03-31 04:09:46.002481	\N	566	1100	2012-01-01 00:00:00	Old Data Migration.
+2121	2022-03-31 04:09:46.204102	2022-03-31 04:09:46.204102	\N	566	225	2014-01-01 00:00:00	Old Data Migration.
+2122	2022-03-31 04:09:47.480594	2022-03-31 04:09:47.480594	\N	566	531	2016-01-01 00:00:00	Old Data Migration.
+2123	2022-03-31 04:09:47.677755	2022-03-31 04:09:47.677755	\N	566	187	2017-01-01 00:00:00	Old Data Migration.
+2124	2022-03-31 04:09:47.874105	2022-03-31 04:09:47.874105	\N	566	797	2019-01-01 00:00:00	Old Data Migration.
+2125	2022-03-31 04:09:48.069051	2022-03-31 04:09:48.069051	\N	567	800	2012-01-01 00:00:00	Old Data Migration.
+2126	2022-03-31 04:09:48.268745	2022-03-31 04:09:48.268745	\N	567	150	2014-01-01 00:00:00	Old Data Migration.
+2127	2022-03-31 04:09:48.459678	2022-03-31 04:09:48.459678	\N	567	150	2015-01-01 00:00:00	Old Data Migration.
+2128	2022-03-31 04:09:48.655318	2022-03-31 04:09:48.655318	\N	567	435	2016-01-01 00:00:00	Old Data Migration.
+2129	2022-03-31 04:09:48.842301	2022-03-31 04:09:48.842301	\N	567	282	2017-01-01 00:00:00	Old Data Migration.
+2130	2022-03-31 04:09:49.031806	2022-03-31 04:09:49.031806	\N	567	553	2019-01-01 00:00:00	Old Data Migration.
+2131	2022-03-31 04:09:49.229962	2022-03-31 04:09:49.229962	\N	568	150	2015-01-01 00:00:00	Old Data Migration.
+2132	2022-03-31 04:09:49.435297	2022-03-31 04:09:49.435297	\N	568	98	2017-01-01 00:00:00	Old Data Migration.
+2133	2022-03-31 04:09:49.632893	2022-03-31 04:09:49.632893	\N	569	458	2019-01-01 00:00:00	Old Data Migration.
+2134	2022-03-31 04:09:49.84173	2022-03-31 04:09:49.84173	\N	569	209	2020-01-01 00:00:00	Old Data Migration.
+2135	2022-03-31 04:09:50.051909	2022-03-31 04:09:50.051909	\N	570	398	2017-01-01 00:00:00	Old Data Migration.
+2136	2022-03-31 04:09:50.249868	2022-03-31 04:09:50.249868	\N	570	242	2018-01-01 00:00:00	Old Data Migration.
+2137	2022-03-31 04:09:50.45441	2022-03-31 04:09:50.45441	\N	570	1356	2020-01-01 00:00:00	Old Data Migration.
+2138	2022-03-31 04:09:50.654687	2022-03-31 04:09:50.654687	\N	570	214	2021-01-01 00:00:00	Old Data Migration.
+2139	2022-03-31 04:09:50.850391	2022-03-31 04:09:50.850391	\N	570	139	2021-09-01 00:00:00	Old Data Migration.
+2140	2022-03-31 04:09:51.054183	2022-03-31 04:09:51.054183	\N	571	500	2014-01-01 00:00:00	Old Data Migration.
+2141	2022-03-31 04:09:51.260471	2022-03-31 04:09:51.260471	\N	571	150	2015-01-01 00:00:00	Old Data Migration.
+2142	2022-03-31 04:09:51.448292	2022-03-31 04:09:51.448292	\N	571	400	2018-01-01 00:00:00	Old Data Migration.
+2143	2022-03-31 04:09:51.643798	2022-03-31 04:09:51.643798	\N	571	1061	2020-01-01 00:00:00	Old Data Migration.
+2144	2022-03-31 04:09:51.841257	2022-03-31 04:09:51.841257	\N	572	348	2017-01-01 00:00:00	Old Data Migration.
+2145	2022-03-31 04:09:52.038987	2022-03-31 04:09:52.038987	\N	572	287	2019-01-01 00:00:00	Old Data Migration.
+2146	2022-03-31 04:09:52.32915	2022-03-31 04:09:52.32915	\N	572	922	2021-09-01 00:00:00	Old Data Migration.
+2147	2022-03-31 04:09:52.648144	2022-03-31 04:09:52.648144	\N	573	100	2014-01-01 00:00:00	Old Data Migration.
+2148	2022-03-31 04:09:52.859993	2022-03-31 04:09:52.859993	\N	574	609	2019-01-01 00:00:00	Old Data Migration.
+2149	2022-03-31 04:09:53.062727	2022-03-31 04:09:53.062727	\N	574	975	2020-01-01 00:00:00	Old Data Migration.
+2150	2022-03-31 04:09:53.258726	2022-03-31 04:09:53.258726	\N	575	339	2018-01-01 00:00:00	Old Data Migration.
+2151	2022-03-31 04:09:53.454219	2022-03-31 04:09:53.454219	\N	575	360	2021-01-01 00:00:00	Old Data Migration.
+2152	2022-03-31 04:09:53.646263	2022-03-31 04:09:53.646263	\N	576	336	2017-01-01 00:00:00	Old Data Migration.
+2153	2022-03-31 04:09:53.837691	2022-03-31 04:09:53.837691	\N	576	179	2018-01-01 00:00:00	Old Data Migration.
+2154	2022-03-31 04:09:54.026853	2022-03-31 04:09:54.026853	\N	576	272	2019-01-01 00:00:00	Old Data Migration.
+2155	2022-03-31 04:09:54.215752	2022-03-31 04:09:54.215752	\N	577	199	2018-01-01 00:00:00	Old Data Migration.
+2156	2022-03-31 04:09:54.42396	2022-03-31 04:09:54.42396	\N	578	400	2014-01-01 00:00:00	Old Data Migration.
+2157	2022-03-31 04:09:54.614197	2022-03-31 04:09:54.614197	\N	578	375	2016-01-01 00:00:00	Old Data Migration.
+2158	2022-03-31 04:09:54.80399	2022-03-31 04:09:54.80399	\N	578	295	2017-01-01 00:00:00	Old Data Migration.
+2159	2022-03-31 04:09:54.990288	2022-03-31 04:09:54.990288	\N	578	810	2021-01-01 00:00:00	Old Data Migration.
+2160	2022-03-31 04:09:55.192263	2022-03-31 04:09:55.192263	\N	579	400	2014-01-01 00:00:00	Old Data Migration.
+2161	2022-03-31 04:09:55.378028	2022-03-31 04:09:55.378028	\N	579	75	2015-01-01 00:00:00	Old Data Migration.
+2162	2022-03-31 04:09:55.56229	2022-03-31 04:09:55.56229	\N	580	700	2015-01-01 00:00:00	Old Data Migration.
+2163	2022-03-31 04:09:55.762886	2022-03-31 04:09:55.762886	\N	580	723	2021-01-01 00:00:00	Old Data Migration.
+2164	2022-03-31 04:09:55.951493	2022-03-31 04:09:55.951493	\N	581	200	2012-01-01 00:00:00	Old Data Migration.
+2165	2022-03-31 04:09:56.139807	2022-03-31 04:09:56.139807	\N	581	100	2013-01-01 00:00:00	Old Data Migration.
+2166	2022-03-31 04:09:56.335644	2022-03-31 04:09:56.335644	\N	582	700	2014-01-01 00:00:00	Old Data Migration.
+2167	2022-03-31 04:09:56.533693	2022-03-31 04:09:56.533693	\N	582	500	2015-01-01 00:00:00	Old Data Migration.
+2168	2022-03-31 04:09:56.745882	2022-03-31 04:09:56.745882	\N	583	1200	2014-01-01 00:00:00	Old Data Migration.
+2169	2022-03-31 04:09:56.950119	2022-03-31 04:09:56.950119	\N	583	400	2016-01-01 00:00:00	Old Data Migration.
+2170	2022-03-31 04:09:57.151016	2022-03-31 04:09:57.151016	\N	583	347	2017-01-01 00:00:00	Old Data Migration.
+2171	2022-03-31 04:09:57.348993	2022-03-31 04:09:57.348993	\N	583	396	2021-01-01 00:00:00	Old Data Migration.
+2172	2022-03-31 04:09:57.545896	2022-03-31 04:09:57.545896	\N	585	542	2019-01-01 00:00:00	Old Data Migration.
+2173	2022-03-31 04:09:57.739709	2022-03-31 04:09:57.739709	\N	585	1029	2020-01-01 00:00:00	Old Data Migration.
+2174	2022-03-31 04:09:57.938652	2022-03-31 04:09:57.938652	\N	585	510	2021-09-01 00:00:00	Old Data Migration.
+2175	2022-03-31 04:09:58.127147	2022-03-31 04:09:58.127147	\N	587	600	2014-01-01 00:00:00	Old Data Migration.
+2176	2022-03-31 04:09:58.326458	2022-03-31 04:09:58.326458	\N	587	400	2015-01-01 00:00:00	Old Data Migration.
+2177	2022-03-31 04:09:58.521015	2022-03-31 04:09:58.521015	\N	587	922	2020-01-01 00:00:00	Old Data Migration.
+2178	2022-03-31 04:09:58.700724	2022-03-31 04:09:58.700724	\N	587	508	2021-09-01 00:00:00	Old Data Migration.
+2179	2022-03-31 04:09:58.886567	2022-03-31 04:09:58.886567	\N	588	407	2018-01-01 00:00:00	Old Data Migration.
+2180	2022-03-31 04:09:59.063974	2022-03-31 04:09:59.063974	\N	589	665	2019-01-01 00:00:00	Old Data Migration.
+2181	2022-03-31 04:09:59.253621	2022-03-31 04:09:59.253621	\N	589	1119	2020-01-01 00:00:00	Old Data Migration.
+2182	2022-03-31 04:09:59.452627	2022-03-31 04:09:59.452627	\N	589	245	2021-01-01 00:00:00	Old Data Migration.
+2183	2022-03-31 04:09:59.641323	2022-03-31 04:09:59.641323	\N	591	150	2014-01-01 00:00:00	Old Data Migration.
+2184	2022-03-31 04:10:00.123909	2022-03-31 04:10:00.123909	\N	592	30	2018-01-01 00:00:00	Old Data Migration.
+2185	2022-03-31 04:10:01.36473	2022-03-31 04:10:01.36473	\N	593	150	2016-01-01 00:00:00	Old Data Migration.
+2186	2022-03-31 04:10:01.569728	2022-03-31 04:10:01.569728	\N	593	239	2018-01-01 00:00:00	Old Data Migration.
+2187	2022-03-31 04:10:01.773488	2022-03-31 04:10:01.773488	\N	594	400	2014-01-01 00:00:00	Old Data Migration.
+2188	2022-03-31 04:10:01.971617	2022-03-31 04:10:01.971617	\N	594	150	2015-01-01 00:00:00	Old Data Migration.
+2189	2022-03-31 04:10:02.159048	2022-03-31 04:10:02.159048	\N	594	225	2016-01-01 00:00:00	Old Data Migration.
+2190	2022-03-31 04:10:02.349565	2022-03-31 04:10:02.349565	\N	594	191	2017-01-01 00:00:00	Old Data Migration.
+2191	2022-03-31 04:10:02.546194	2022-03-31 04:10:02.546194	\N	594	969	2020-01-01 00:00:00	Old Data Migration.
+2192	2022-03-31 04:10:02.735242	2022-03-31 04:10:02.735242	\N	595	700	2014-01-01 00:00:00	Old Data Migration.
+2193	2022-03-31 04:10:02.919399	2022-03-31 04:10:02.919399	\N	595	244	2020-01-01 00:00:00	Old Data Migration.
+2194	2022-03-31 04:10:03.106196	2022-03-31 04:10:03.106196	\N	596	431	2019-01-01 00:00:00	Old Data Migration.
+2195	2022-03-31 04:10:03.328599	2022-03-31 04:10:03.328599	\N	596	318	2020-01-01 00:00:00	Old Data Migration.
+2196	2022-03-31 04:10:03.518618	2022-03-31 04:10:03.518618	\N	597	366	2017-01-01 00:00:00	Old Data Migration.
+2197	2022-03-31 04:10:03.698383	2022-03-31 04:10:03.698383	\N	598	310	2017-01-01 00:00:00	Old Data Migration.
+2198	2022-03-31 04:10:03.874976	2022-03-31 04:10:03.874976	\N	598	213	2021-09-01 00:00:00	Old Data Migration.
+2199	2022-03-31 04:10:05.136822	2022-03-31 04:10:05.136822	\N	599	20	2014-01-01 00:00:00	Old Data Migration.
+2200	2022-03-31 04:10:05.33171	2022-03-31 04:10:05.33171	\N	600	150	2016-01-01 00:00:00	Old Data Migration.
+2201	2022-03-31 04:10:05.526743	2022-03-31 04:10:05.526743	\N	601	250	2014-01-01 00:00:00	Old Data Migration.
+2202	2022-03-31 04:10:05.713709	2022-03-31 04:10:05.713709	\N	601	293	2019-01-01 00:00:00	Old Data Migration.
+2203	2022-03-31 04:10:05.910051	2022-03-31 04:10:05.910051	\N	601	744	2021-01-01 00:00:00	Old Data Migration.
+2204	2022-03-31 04:10:06.095988	2022-03-31 04:10:06.095988	\N	602	400	2012-01-01 00:00:00	Old Data Migration.
+2205	2022-03-31 04:10:06.287018	2022-03-31 04:10:06.287018	\N	602	75	2015-01-01 00:00:00	Old Data Migration.
+2206	2022-03-31 04:10:06.477777	2022-03-31 04:10:06.477777	\N	602	682	2018-01-01 00:00:00	Old Data Migration.
+2207	2022-03-31 04:10:06.667091	2022-03-31 04:10:06.667091	\N	602	634	2019-01-01 00:00:00	Old Data Migration.
+2208	2022-03-31 04:10:06.853865	2022-03-31 04:10:06.853865	\N	603	225	2016-01-01 00:00:00	Old Data Migration.
+2209	2022-03-31 04:10:07.048223	2022-03-31 04:10:07.048223	\N	603	280	2017-01-01 00:00:00	Old Data Migration.
+2210	2022-03-31 04:10:07.241953	2022-03-31 04:10:07.241953	\N	604	300	2012-01-01 00:00:00	Old Data Migration.
+2211	2022-03-31 04:10:07.432944	2022-03-31 04:10:07.432944	\N	604	1100	2013-01-01 00:00:00	Old Data Migration.
+2212	2022-03-31 04:10:07.625142	2022-03-31 04:10:07.625142	\N	604	1460	2020-01-01 00:00:00	Old Data Migration.
+2213	2022-03-31 04:10:07.826203	2022-03-31 04:10:07.826203	\N	605	300	2014-01-01 00:00:00	Old Data Migration.
+2214	2022-03-31 04:10:08.017466	2022-03-31 04:10:08.017466	\N	605	150	2015-01-01 00:00:00	Old Data Migration.
+2215	2022-03-31 04:10:08.284546	2022-03-31 04:10:08.284546	\N	605	454	2017-01-01 00:00:00	Old Data Migration.
+2216	2022-03-31 04:10:09.623219	2022-03-31 04:10:09.623219	\N	605	1015	2020-01-01 00:00:00	Old Data Migration.
+2217	2022-03-31 04:10:09.803376	2022-03-31 04:10:09.803376	\N	606	124	2018-01-01 00:00:00	Old Data Migration.
+2218	2022-03-31 04:10:09.999675	2022-03-31 04:10:09.999675	\N	608	800	2012-01-01 00:00:00	Old Data Migration.
+2219	2022-03-31 04:10:10.203828	2022-03-31 04:10:10.203828	\N	608	1400	2013-01-01 00:00:00	Old Data Migration.
+2220	2022-03-31 04:10:10.397124	2022-03-31 04:10:10.397124	\N	608	900	2014-01-01 00:00:00	Old Data Migration.
+2221	2022-03-31 04:10:10.581684	2022-03-31 04:10:10.581684	\N	608	500	2015-01-01 00:00:00	Old Data Migration.
+2222	2022-03-31 04:10:10.776999	2022-03-31 04:10:10.776999	\N	608	225	2016-01-01 00:00:00	Old Data Migration.
+2223	2022-03-31 04:10:11.007099	2022-03-31 04:10:11.007099	\N	608	469	2020-01-01 00:00:00	Old Data Migration.
+2224	2022-03-31 04:10:11.20973	2022-03-31 04:10:11.20973	\N	608	326	2021-01-01 00:00:00	Old Data Migration.
+2225	2022-03-31 04:10:11.406731	2022-03-31 04:10:11.406731	\N	609	200	2015-01-01 00:00:00	Old Data Migration.
+2226	2022-03-31 04:10:11.611615	2022-03-31 04:10:11.611615	\N	610	300	2012-01-01 00:00:00	Old Data Migration.
+2227	2022-03-31 04:10:11.819853	2022-03-31 04:10:11.819853	\N	611	300	2014-01-01 00:00:00	Old Data Migration.
+2228	2022-03-31 04:10:12.015936	2022-03-31 04:10:12.015936	\N	611	150	2015-01-01 00:00:00	Old Data Migration.
+2229	2022-03-31 04:10:12.219179	2022-03-31 04:10:12.219179	\N	611	56	2017-01-01 00:00:00	Old Data Migration.
+2230	2022-03-31 04:10:12.412961	2022-03-31 04:10:12.412961	\N	611	166	2018-01-01 00:00:00	Old Data Migration.
+2231	2022-03-31 04:10:12.618912	2022-03-31 04:10:12.618912	\N	611	817	2021-01-01 00:00:00	Old Data Migration.
+2232	2022-03-31 04:10:12.829312	2022-03-31 04:10:12.829312	\N	611	224	2021-09-01 00:00:00	Old Data Migration.
+2233	2022-03-31 04:10:13.029525	2022-03-31 04:10:13.029525	\N	612	946	2020-01-01 00:00:00	Old Data Migration.
+2234	2022-03-31 04:10:13.231971	2022-03-31 04:10:13.231971	\N	613	150	2015-01-01 00:00:00	Old Data Migration.
+2235	2022-03-31 04:10:13.442239	2022-03-31 04:10:13.442239	\N	613	243	2019-01-01 00:00:00	Old Data Migration.
+2236	2022-03-31 04:10:13.644298	2022-03-31 04:10:13.644298	\N	614	58	2017-01-01 00:00:00	Old Data Migration.
+2237	2022-03-31 04:10:13.842874	2022-03-31 04:10:13.842874	\N	615	400	2014-01-01 00:00:00	Old Data Migration.
+2238	2022-03-31 04:10:14.046969	2022-03-31 04:10:14.046969	\N	616	100	2018-01-01 00:00:00	Old Data Migration.
+2239	2022-03-31 04:10:14.260923	2022-03-31 04:10:14.260923	\N	617	300	2013-01-01 00:00:00	Old Data Migration.
+2240	2022-03-31 04:10:14.472398	2022-03-31 04:10:14.472398	\N	618	541	2017-01-01 00:00:00	Old Data Migration.
+2241	2022-03-31 04:10:14.983398	2022-03-31 04:10:14.983398	\N	618	350	2018-01-01 00:00:00	Old Data Migration.
+2242	2022-03-31 04:10:15.187537	2022-03-31 04:10:15.187537	\N	618	406	2019-01-01 00:00:00	Old Data Migration.
+2243	2022-03-31 04:10:15.407123	2022-03-31 04:10:15.407123	\N	618	763	2021-01-01 00:00:00	Old Data Migration.
+2244	2022-03-31 04:10:15.64736	2022-03-31 04:10:15.64736	\N	619	100	2018-01-01 00:00:00	Old Data Migration.
+2245	2022-03-31 04:10:15.845305	2022-03-31 04:10:15.845305	\N	620	200	2013-01-01 00:00:00	Old Data Migration.
+2246	2022-03-31 04:10:16.062835	2022-03-31 04:10:16.062835	\N	620	600	2014-01-01 00:00:00	Old Data Migration.
+2247	2022-03-31 04:10:16.265719	2022-03-31 04:10:16.265719	\N	620	150	2015-01-01 00:00:00	Old Data Migration.
+2248	2022-03-31 04:10:16.461218	2022-03-31 04:10:16.461218	\N	620	404	2017-01-01 00:00:00	Old Data Migration.
+2249	2022-03-31 04:10:16.674819	2022-03-31 04:10:16.674819	\N	620	857	2021-09-01 00:00:00	Old Data Migration.
+2250	2022-03-31 04:10:16.876342	2022-03-31 04:10:16.876342	\N	621	100	2012-01-01 00:00:00	Old Data Migration.
+2251	2022-03-31 04:10:17.076596	2022-03-31 04:10:17.076596	\N	621	600	2013-01-01 00:00:00	Old Data Migration.
+2252	2022-03-31 04:10:17.277139	2022-03-31 04:10:17.277139	\N	621	1223	2020-01-01 00:00:00	Old Data Migration.
+2253	2022-03-31 04:10:17.496615	2022-03-31 04:10:17.496615	\N	622	1000	2011-01-01 00:00:00	Old Data Migration.
+2254	2022-03-31 04:10:17.687572	2022-03-31 04:10:17.687572	\N	622	200	2012-01-01 00:00:00	Old Data Migration.
+2255	2022-03-31 04:10:17.877784	2022-03-31 04:10:17.877784	\N	622	920	2019-01-01 00:00:00	Old Data Migration.
+2256	2022-03-31 04:10:18.063521	2022-03-31 04:10:18.063521	\N	622	1333	2020-01-01 00:00:00	Old Data Migration.
+2257	2022-03-31 04:10:18.259542	2022-03-31 04:10:18.259542	\N	623	600	2015-01-01 00:00:00	Old Data Migration.
+2258	2022-03-31 04:10:18.458358	2022-03-31 04:10:18.458358	\N	623	75	2016-01-01 00:00:00	Old Data Migration.
+2259	2022-03-31 04:10:18.659262	2022-03-31 04:10:18.659262	\N	624	203	2021-01-01 00:00:00	Old Data Migration.
+2260	2022-03-31 04:10:18.873966	2022-03-31 04:10:18.873966	\N	625	300	2015-01-01 00:00:00	Old Data Migration.
+2261	2022-03-31 04:10:19.06773	2022-03-31 04:10:19.06773	\N	626	600	2014-01-01 00:00:00	Old Data Migration.
+2262	2022-03-31 04:10:19.259449	2022-03-31 04:10:19.259449	\N	626	400	2015-01-01 00:00:00	Old Data Migration.
+2263	2022-03-31 04:10:19.454095	2022-03-31 04:10:19.454095	\N	626	225	2016-01-01 00:00:00	Old Data Migration.
+2264	2022-03-31 04:10:19.653967	2022-03-31 04:10:19.653967	\N	626	53	2017-01-01 00:00:00	Old Data Migration.
+2265	2022-03-31 04:10:19.859424	2022-03-31 04:10:19.859424	\N	626	1363	2020-01-01 00:00:00	Old Data Migration.
+2266	2022-03-31 04:10:20.111959	2022-03-31 04:10:20.111959	\N	627	200	2012-01-01 00:00:00	Old Data Migration.
+2267	2022-03-31 04:10:20.667638	2022-03-31 04:10:20.667638	\N	627	300	2014-01-01 00:00:00	Old Data Migration.
+2268	2022-03-31 04:10:20.861484	2022-03-31 04:10:20.861484	\N	627	150	2015-01-01 00:00:00	Old Data Migration.
+2269	2022-03-31 04:10:21.066695	2022-03-31 04:10:21.066695	\N	627	150	2016-01-01 00:00:00	Old Data Migration.
+2270	2022-03-31 04:10:21.264685	2022-03-31 04:10:21.264685	\N	627	193	2017-01-01 00:00:00	Old Data Migration.
+2271	2022-03-31 04:10:21.462561	2022-03-31 04:10:21.462561	\N	627	400	2018-01-01 00:00:00	Old Data Migration.
+2272	2022-03-31 04:10:21.651718	2022-03-31 04:10:21.651718	\N	628	449	2018-01-01 00:00:00	Old Data Migration.
+2273	2022-03-31 04:10:21.847821	2022-03-31 04:10:21.847821	\N	628	344	2019-01-01 00:00:00	Old Data Migration.
+2274	2022-03-31 04:10:22.05242	2022-03-31 04:10:22.05242	\N	628	243	2021-01-01 00:00:00	Old Data Migration.
+2275	2022-03-31 04:10:22.253158	2022-03-31 04:10:22.253158	\N	629	75	2016-01-01 00:00:00	Old Data Migration.
+2276	2022-03-31 04:10:22.459103	2022-03-31 04:10:22.459103	\N	629	53	2017-01-01 00:00:00	Old Data Migration.
+2277	2022-03-31 04:10:22.669967	2022-03-31 04:10:22.669967	\N	629	489	2018-01-01 00:00:00	Old Data Migration.
+2278	2022-03-31 04:10:22.909863	2022-03-31 04:10:22.909863	\N	629	277	2021-01-01 00:00:00	Old Data Migration.
+2279	2022-03-31 04:10:23.114642	2022-03-31 04:10:23.114642	\N	630	100	2018-01-01 00:00:00	Old Data Migration.
+2280	2022-03-31 04:10:23.326501	2022-03-31 04:10:23.326501	\N	631	1000	2014-01-01 00:00:00	Old Data Migration.
+2281	2022-03-31 04:10:23.521946	2022-03-31 04:10:23.521946	\N	632	434	2018-01-01 00:00:00	Old Data Migration.
+2282	2022-03-31 04:10:23.726024	2022-03-31 04:10:23.726024	\N	632	495	2019-01-01 00:00:00	Old Data Migration.
+2283	2022-03-31 04:10:23.925767	2022-03-31 04:10:23.925767	\N	632	757	2021-01-01 00:00:00	Old Data Migration.
+2284	2022-03-31 04:10:24.118642	2022-03-31 04:10:24.118642	\N	633	300	2012-01-01 00:00:00	Old Data Migration.
+2285	2022-03-31 04:10:24.315476	2022-03-31 04:10:24.315476	\N	633	100	2013-01-01 00:00:00	Old Data Migration.
+2286	2022-03-31 04:10:24.509179	2022-03-31 04:10:24.509179	\N	633	75	2015-01-01 00:00:00	Old Data Migration.
+2287	2022-03-31 04:10:24.704141	2022-03-31 04:10:24.704141	\N	633	375	2016-01-01 00:00:00	Old Data Migration.
+2288	2022-03-31 04:10:25.049758	2022-03-31 04:10:25.049758	\N	633	157	2017-01-01 00:00:00	Old Data Migration.
+2289	2022-03-31 04:10:25.24662	2022-03-31 04:10:25.24662	\N	633	211	2019-01-01 00:00:00	Old Data Migration.
+2290	2022-03-31 04:10:25.4463	2022-03-31 04:10:25.4463	\N	633	1232	2020-01-01 00:00:00	Old Data Migration.
+2291	2022-03-31 04:10:25.640754	2022-03-31 04:10:25.640754	\N	634	350	2013-01-01 00:00:00	Old Data Migration.
+2292	2022-03-31 04:10:25.837431	2022-03-31 04:10:25.837431	\N	634	600	2015-01-01 00:00:00	Old Data Migration.
+2293	2022-03-31 04:10:26.040939	2022-03-31 04:10:26.040939	\N	635	399	2017-01-01 00:00:00	Old Data Migration.
+2294	2022-03-31 04:10:26.237983	2022-03-31 04:10:26.237983	\N	635	279	2018-01-01 00:00:00	Old Data Migration.
+2295	2022-03-31 04:10:26.443469	2022-03-31 04:10:26.443469	\N	635	1097	2020-01-01 00:00:00	Old Data Migration.
+2296	2022-03-31 04:10:26.640227	2022-03-31 04:10:26.640227	\N	635	125	2021-01-01 00:00:00	Old Data Migration.
+2297	2022-03-31 04:10:26.84035	2022-03-31 04:10:26.84035	\N	636	600	2014-01-01 00:00:00	Old Data Migration.
+2298	2022-03-31 04:10:27.050222	2022-03-31 04:10:27.050222	\N	636	400	2015-01-01 00:00:00	Old Data Migration.
+2299	2022-03-31 04:10:27.256965	2022-03-31 04:10:27.256965	\N	636	1329	2021-01-01 00:00:00	Old Data Migration.
+2300	2022-03-31 04:10:27.463601	2022-03-31 04:10:27.463601	\N	637	100	2012-01-01 00:00:00	Old Data Migration.
+2301	2022-03-31 04:10:27.670408	2022-03-31 04:10:27.670408	\N	637	600	2013-01-01 00:00:00	Old Data Migration.
+2302	2022-03-31 04:10:27.869644	2022-03-31 04:10:27.869644	\N	637	325	2017-01-01 00:00:00	Old Data Migration.
+2303	2022-03-31 04:10:28.05791	2022-03-31 04:10:28.05791	\N	638	200	2012-01-01 00:00:00	Old Data Migration.
+2304	2022-03-31 04:10:28.402351	2022-03-31 04:10:28.402351	\N	638	700	2013-01-01 00:00:00	Old Data Migration.
+2305	2022-03-31 04:10:28.679124	2022-03-31 04:10:28.679124	\N	638	659	2020-01-01 00:00:00	Old Data Migration.
+2306	2022-03-31 04:10:28.923176	2022-03-31 04:10:28.923176	\N	638	655	2021-09-01 00:00:00	Old Data Migration.
+2307	2022-03-31 04:10:29.132079	2022-03-31 04:10:29.132079	\N	639	100	2014-01-01 00:00:00	Old Data Migration.
+2308	2022-03-31 04:10:29.331195	2022-03-31 04:10:29.331195	\N	640	675	2017-01-01 00:00:00	Old Data Migration.
+2309	2022-03-31 04:10:29.529503	2022-03-31 04:10:29.529503	\N	640	325	2018-01-01 00:00:00	Old Data Migration.
+2310	2022-03-31 04:10:29.72907	2022-03-31 04:10:29.72907	\N	640	1152	2020-01-01 00:00:00	Old Data Migration.
+2311	2022-03-31 04:10:29.926231	2022-03-31 04:10:29.926231	\N	640	381	2021-01-01 00:00:00	Old Data Migration.
+2312	2022-03-31 04:10:30.123667	2022-03-31 04:10:30.123667	\N	640	122	2021-09-01 00:00:00	Old Data Migration.
+2313	2022-03-31 04:10:30.327086	2022-03-31 04:10:30.327086	\N	873	1000	2012-01-01 00:00:00	Old Data Migration.
+2314	2022-03-31 04:10:30.522152	2022-03-31 04:10:30.522152	\N	873	225	2014-01-01 00:00:00	Old Data Migration.
+2315	2022-03-31 04:10:30.744508	2022-03-31 04:10:30.744508	\N	873	389	2015-01-01 00:00:00	Old Data Migration.
+2316	2022-03-31 04:10:31.943702	2022-03-31 04:10:31.943702	\N	873	410	2016-01-01 00:00:00	Old Data Migration.
+2317	2022-03-31 04:10:32.144545	2022-03-31 04:10:32.144545	\N	873	203	2021-09-01 00:00:00	Old Data Migration.
+2318	2022-03-31 04:10:32.33988	2022-03-31 04:10:32.33988	\N	642	225	2016-01-01 00:00:00	Old Data Migration.
+2319	2022-03-31 04:10:32.534176	2022-03-31 04:10:32.534176	\N	642	199	2017-01-01 00:00:00	Old Data Migration.
+2320	2022-03-31 04:10:32.731313	2022-03-31 04:10:32.731313	\N	643	200	2013-01-01 00:00:00	Old Data Migration.
+2321	2022-03-31 04:10:32.937465	2022-03-31 04:10:32.937465	\N	643	150	2016-01-01 00:00:00	Old Data Migration.
+2322	2022-03-31 04:10:33.139621	2022-03-31 04:10:33.139621	\N	643	475	2019-01-01 00:00:00	Old Data Migration.
+2323	2022-03-31 04:10:33.342311	2022-03-31 04:10:33.342311	\N	644	200	2013-01-01 00:00:00	Old Data Migration.
+2324	2022-03-31 04:10:33.544394	2022-03-31 04:10:33.544394	\N	644	334	2017-01-01 00:00:00	Old Data Migration.
+2325	2022-03-31 04:10:33.746991	2022-03-31 04:10:33.746991	\N	644	247	2018-01-01 00:00:00	Old Data Migration.
+2326	2022-03-31 04:10:33.952404	2022-03-31 04:10:33.952404	\N	645	20	2014-01-01 00:00:00	Old Data Migration.
+2327	2022-03-31 04:10:34.147946	2022-03-31 04:10:34.147946	\N	646	1078	2021-09-01 00:00:00	Old Data Migration.
+2328	2022-03-31 04:10:34.356491	2022-03-31 04:10:34.356491	\N	647	525	2016-01-01 00:00:00	Old Data Migration.
+2329	2022-03-31 04:10:34.553557	2022-03-31 04:10:34.553557	\N	648	361	2018-01-01 00:00:00	Old Data Migration.
+2330	2022-03-31 04:10:34.745668	2022-03-31 04:10:34.745668	\N	648	402	2019-01-01 00:00:00	Old Data Migration.
+2331	2022-03-31 04:10:34.942595	2022-03-31 04:10:34.942595	\N	649	569	2018-01-01 00:00:00	Old Data Migration.
+2332	2022-03-31 04:10:35.152571	2022-03-31 04:10:35.152571	\N	649	511	2019-01-01 00:00:00	Old Data Migration.
+2333	2022-03-31 04:10:35.341601	2022-03-31 04:10:35.341601	\N	649	1357	2020-01-01 00:00:00	Old Data Migration.
+2334	2022-03-31 04:10:35.533733	2022-03-31 04:10:35.533733	\N	650	150	2016-01-01 00:00:00	Old Data Migration.
+2335	2022-03-31 04:10:35.723759	2022-03-31 04:10:35.723759	\N	650	315	2017-01-01 00:00:00	Old Data Migration.
+2336	2022-03-31 04:10:35.922768	2022-03-31 04:10:35.922768	\N	650	1208	2020-01-01 00:00:00	Old Data Migration.
+2337	2022-03-31 04:10:36.225186	2022-03-31 04:10:36.225186	\N	651	857	2021-09-01 00:00:00	Old Data Migration.
+2338	2022-03-31 04:10:37.455852	2022-03-31 04:10:37.455852	\N	652	322	2017-01-01 00:00:00	Old Data Migration.
+2339	2022-03-31 04:10:38.656961	2022-03-31 04:10:38.656961	\N	652	243	2018-01-01 00:00:00	Old Data Migration.
+2340	2022-03-31 04:10:38.85552	2022-03-31 04:10:38.85552	\N	652	433	2019-01-01 00:00:00	Old Data Migration.
+2341	2022-03-31 04:10:39.067114	2022-03-31 04:10:39.067114	\N	652	773	2021-01-01 00:00:00	Old Data Migration.
+2342	2022-03-31 04:10:39.256712	2022-03-31 04:10:39.256712	\N	653	600	2013-01-01 00:00:00	Old Data Migration.
+2343	2022-03-31 04:10:39.458954	2022-03-31 04:10:39.458954	\N	654	394	2017-01-01 00:00:00	Old Data Migration.
+2344	2022-03-31 04:10:39.655157	2022-03-31 04:10:39.655157	\N	654	367	2019-01-01 00:00:00	Old Data Migration.
+2345	2022-03-31 04:10:39.864364	2022-03-31 04:10:39.864364	\N	655	352	2017-01-01 00:00:00	Old Data Migration.
+2346	2022-03-31 04:10:40.059087	2022-03-31 04:10:40.059087	\N	655	179	2019-01-01 00:00:00	Old Data Migration.
+2347	2022-03-31 04:10:40.257712	2022-03-31 04:10:40.257712	\N	656	303	2017-01-01 00:00:00	Old Data Migration.
+2348	2022-03-31 04:10:40.447802	2022-03-31 04:10:40.447802	\N	656	371	2018-01-01 00:00:00	Old Data Migration.
+2349	2022-03-31 04:10:40.635432	2022-03-31 04:10:40.635432	\N	656	318	2019-01-01 00:00:00	Old Data Migration.
+2350	2022-03-31 04:10:40.837116	2022-03-31 04:10:40.837116	\N	656	710	2021-01-01 00:00:00	Old Data Migration.
+2351	2022-03-31 04:10:41.039987	2022-03-31 04:10:41.039987	\N	657	800	2014-01-01 00:00:00	Old Data Migration.
+2352	2022-03-31 04:10:41.232017	2022-03-31 04:10:41.232017	\N	657	839	2020-01-01 00:00:00	Old Data Migration.
+2353	2022-03-31 04:10:41.431283	2022-03-31 04:10:41.431283	\N	658	400	2015-01-01 00:00:00	Old Data Migration.
+2354	2022-03-31 04:10:41.64405	2022-03-31 04:10:41.64405	\N	658	150	2016-01-01 00:00:00	Old Data Migration.
+2355	2022-03-31 04:10:41.834654	2022-03-31 04:10:41.834654	\N	658	330	2018-01-01 00:00:00	Old Data Migration.
+2356	2022-03-31 04:10:42.037291	2022-03-31 04:10:42.037291	\N	658	1173	2021-01-01 00:00:00	Old Data Migration.
+2357	2022-03-31 04:10:42.23681	2022-03-31 04:10:42.23681	\N	658	209	2021-09-01 00:00:00	Old Data Migration.
+2358	2022-03-31 04:10:42.426085	2022-03-31 04:10:42.426085	\N	659	300	2015-01-01 00:00:00	Old Data Migration.
+2359	2022-03-31 04:10:42.61936	2022-03-31 04:10:42.61936	\N	659	960	2020-01-01 00:00:00	Old Data Migration.
+2360	2022-03-31 04:10:42.829055	2022-03-31 04:10:42.829055	\N	660	375	2014-01-01 00:00:00	Old Data Migration.
+2361	2022-03-31 04:10:43.038107	2022-03-31 04:10:43.038107	\N	660	364	2015-01-01 00:00:00	Old Data Migration.
+2362	2022-03-31 04:10:43.244595	2022-03-31 04:10:43.244595	\N	660	318	2016-01-01 00:00:00	Old Data Migration.
+2363	2022-03-31 04:10:43.452613	2022-03-31 04:10:43.452613	\N	660	306	2020-01-01 00:00:00	Old Data Migration.
+2364	2022-03-31 04:10:43.649505	2022-03-31 04:10:43.649505	\N	661	365	2015-01-01 00:00:00	Old Data Migration.
+2365	2022-03-31 04:10:43.854094	2022-03-31 04:10:43.854094	\N	661	254	2016-01-01 00:00:00	Old Data Migration.
+2366	2022-03-31 04:10:44.08444	2022-03-31 04:10:44.08444	\N	662	1226	2019-01-01 00:00:00	Old Data Migration.
+2367	2022-03-31 04:10:44.391361	2022-03-31 04:10:44.391361	\N	663	263	2021-09-01 00:00:00	Old Data Migration.
+2368	2022-03-31 04:10:44.625066	2022-03-31 04:10:44.625066	\N	664	464	2015-01-01 00:00:00	Old Data Migration.
+2369	2022-03-31 04:10:44.967328	2022-03-31 04:10:44.967328	\N	664	347	2016-01-01 00:00:00	Old Data Migration.
+2370	2022-03-31 04:10:45.166155	2022-03-31 04:10:45.166155	\N	664	513	2020-01-01 00:00:00	Old Data Migration.
+2371	2022-03-31 04:10:45.364506	2022-03-31 04:10:45.364506	\N	665	487	2016-01-01 00:00:00	Old Data Migration.
+2372	2022-03-31 04:10:45.559685	2022-03-31 04:10:45.559685	\N	665	419	2017-01-01 00:00:00	Old Data Migration.
+2373	2022-03-31 04:10:45.764419	2022-03-31 04:10:45.764419	\N	666	800	2012-01-01 00:00:00	Old Data Migration.
+2374	2022-03-31 04:10:45.961083	2022-03-31 04:10:45.961083	\N	666	225	2014-01-01 00:00:00	Old Data Migration.
+2375	2022-03-31 04:10:46.166686	2022-03-31 04:10:46.166686	\N	666	472	2015-01-01 00:00:00	Old Data Migration.
+2376	2022-03-31 04:10:46.374543	2022-03-31 04:10:46.374543	\N	667	1380	2019-01-01 00:00:00	Old Data Migration.
+2377	2022-03-31 04:10:46.863431	2022-03-31 04:10:46.863431	\N	668	609	2017-01-01 00:00:00	Old Data Migration.
+2378	2022-03-31 04:10:47.06374	2022-03-31 04:10:47.06374	\N	669	475	2015-01-01 00:00:00	Old Data Migration.
+2379	2022-03-31 04:10:47.264523	2022-03-31 04:10:47.264523	\N	669	314	2017-01-01 00:00:00	Old Data Migration.
+2380	2022-03-31 04:10:47.468597	2022-03-31 04:10:47.468597	\N	669	1396	2018-01-01 00:00:00	Old Data Migration.
+2381	2022-03-31 04:10:47.661085	2022-03-31 04:10:47.661085	\N	670	1100	2011-01-01 00:00:00	Old Data Migration.
+2382	2022-03-31 04:10:47.863507	2022-03-31 04:10:47.863507	\N	670	700	2012-01-01 00:00:00	Old Data Migration.
+2383	2022-03-31 04:10:48.371604	2022-03-31 04:10:48.371604	\N	670	450	2014-01-01 00:00:00	Old Data Migration.
+2384	2022-03-31 04:10:48.83084	2022-03-31 04:10:48.83084	\N	670	35	2016-01-01 00:00:00	Old Data Migration.
+2385	2022-03-31 04:10:49.033361	2022-03-31 04:10:49.033361	\N	671	200	2011-01-01 00:00:00	Old Data Migration.
+2386	2022-03-31 04:10:49.523993	2022-03-31 04:10:49.523993	\N	672	1356	2019-01-01 00:00:00	Old Data Migration.
+2387	2022-03-31 04:10:49.931423	2022-03-31 04:10:49.931423	\N	673	350	2015-01-01 00:00:00	Old Data Migration.
+2388	2022-03-31 04:10:51.142424	2022-03-31 04:10:51.142424	\N	673	529	2020-01-01 00:00:00	Old Data Migration.
+2389	2022-03-31 04:10:51.552201	2022-03-31 04:10:51.552201	\N	673	47	2021-09-01 00:00:00	Old Data Migration.
+2390	2022-03-31 04:10:51.914578	2022-03-31 04:10:51.914578	\N	674	336	2016-01-01 00:00:00	Old Data Migration.
+2391	2022-03-31 04:10:52.957084	2022-03-31 04:10:52.957084	\N	674	251	2020-01-01 00:00:00	Old Data Migration.
+2392	2022-03-31 04:10:53.522951	2022-03-31 04:10:53.522951	\N	675	278	2015-01-01 00:00:00	Old Data Migration.
+2393	2022-03-31 04:10:53.82904	2022-03-31 04:10:53.82904	\N	675	377	2017-01-01 00:00:00	Old Data Migration.
+2394	2022-03-31 04:10:54.08069	2022-03-31 04:10:54.08069	\N	675	177	2018-01-01 00:00:00	Old Data Migration.
+2395	2022-03-31 04:10:54.290085	2022-03-31 04:10:54.290085	\N	675	124	2019-01-01 00:00:00	Old Data Migration.
+2396	2022-03-31 04:10:54.492045	2022-03-31 04:10:54.492045	\N	676	5	2015-01-01 00:00:00	Old Data Migration.
+2397	2022-03-31 04:10:54.694557	2022-03-31 04:10:54.694557	\N	677	428	2017-01-01 00:00:00	Old Data Migration.
+2398	2022-03-31 04:10:55.129576	2022-03-31 04:10:55.129576	\N	677	277	2018-01-01 00:00:00	Old Data Migration.
+2399	2022-03-31 04:10:55.329695	2022-03-31 04:10:55.329695	\N	678	1200	2012-01-01 00:00:00	Old Data Migration.
+2400	2022-03-31 04:10:55.529095	2022-03-31 04:10:55.529095	\N	678	400	2013-01-01 00:00:00	Old Data Migration.
+2401	2022-03-31 04:10:55.734474	2022-03-31 04:10:55.734474	\N	678	225	2014-01-01 00:00:00	Old Data Migration.
+2402	2022-03-31 04:10:55.938628	2022-03-31 04:10:55.938628	\N	678	228	2021-09-01 00:00:00	Old Data Migration.
+2403	2022-03-31 04:10:56.145201	2022-03-31 04:10:56.145201	\N	679	386	2018-01-01 00:00:00	Old Data Migration.
+2404	2022-03-31 04:10:56.345494	2022-03-31 04:10:56.345494	\N	679	130	2019-01-01 00:00:00	Old Data Migration.
+2405	2022-03-31 04:10:56.553537	2022-03-31 04:10:56.553537	\N	680	160	2019-01-01 00:00:00	Old Data Migration.
+2406	2022-03-31 04:10:56.74856	2022-03-31 04:10:56.74856	\N	680	128	2020-01-01 00:00:00	Old Data Migration.
+2407	2022-03-31 04:10:56.952769	2022-03-31 04:10:56.952769	\N	681	200	2011-01-01 00:00:00	Old Data Migration.
+2408	2022-03-31 04:10:57.148943	2022-03-31 04:10:57.148943	\N	682	100	2011-01-01 00:00:00	Old Data Migration.
+2409	2022-03-31 04:10:57.337289	2022-03-31 04:10:57.337289	\N	682	380	2020-01-01 00:00:00	Old Data Migration.
+2410	2022-03-31 04:10:57.529438	2022-03-31 04:10:57.529438	\N	683	784	2020-01-01 00:00:00	Old Data Migration.
+2411	2022-03-31 04:10:57.722275	2022-03-31 04:10:57.722275	\N	685	300	2014-01-01 00:00:00	Old Data Migration.
+2412	2022-03-31 04:10:57.919709	2022-03-31 04:10:57.919709	\N	685	280	2015-01-01 00:00:00	Old Data Migration.
+2413	2022-03-31 04:10:58.123105	2022-03-31 04:10:58.123105	\N	685	191	2017-01-01 00:00:00	Old Data Migration.
+2414	2022-03-31 04:10:58.319677	2022-03-31 04:10:58.319677	\N	686	500	2013-01-01 00:00:00	Old Data Migration.
+2415	2022-03-31 04:10:58.518189	2022-03-31 04:10:58.518189	\N	686	437	2015-01-01 00:00:00	Old Data Migration.
+2416	2022-03-31 04:10:58.72048	2022-03-31 04:10:58.72048	\N	687	91	2020-01-01 00:00:00	Old Data Migration.
+2417	2022-03-31 04:10:58.923713	2022-03-31 04:10:58.923713	\N	688	800	2012-01-01 00:00:00	Old Data Migration.
+2418	2022-03-31 04:10:59.129055	2022-03-31 04:10:59.129055	\N	688	800	2013-01-01 00:00:00	Old Data Migration.
+2419	2022-03-31 04:10:59.361798	2022-03-31 04:10:59.361798	\N	688	382	2018-01-01 00:00:00	Old Data Migration.
+2420	2022-03-31 04:10:59.568705	2022-03-31 04:10:59.568705	\N	689	192	2015-01-01 00:00:00	Old Data Migration.
+2421	2022-03-31 04:10:59.76158	2022-03-31 04:10:59.76158	\N	689	7	2017-01-01 00:00:00	Old Data Migration.
+2422	2022-03-31 04:10:59.963447	2022-03-31 04:10:59.963447	\N	689	829	2018-01-01 00:00:00	Old Data Migration.
+2423	2022-03-31 04:11:00.17391	2022-03-31 04:11:00.17391	\N	690	200	2011-01-01 00:00:00	Old Data Migration.
+2424	2022-03-31 04:11:00.375269	2022-03-31 04:11:00.375269	\N	690	500	2012-01-01 00:00:00	Old Data Migration.
+2425	2022-03-31 04:11:00.568869	2022-03-31 04:11:00.568869	\N	690	75	2013-01-01 00:00:00	Old Data Migration.
+2426	2022-03-31 04:11:00.76339	2022-03-31 04:11:00.76339	\N	690	193	2017-01-01 00:00:00	Old Data Migration.
+2427	2022-03-31 04:11:00.973742	2022-03-31 04:11:00.973742	\N	691	1186	2019-01-01 00:00:00	Old Data Migration.
+2428	2022-03-31 04:11:01.200687	2022-03-31 04:11:01.200687	\N	692	200	2011-01-01 00:00:00	Old Data Migration.
+2429	2022-03-31 04:11:01.412194	2022-03-31 04:11:01.412194	\N	692	1145	2019-01-01 00:00:00	Old Data Migration.
+2430	2022-03-31 04:11:01.627686	2022-03-31 04:11:01.627686	\N	693	1215	2019-01-01 00:00:00	Old Data Migration.
+2431	2022-03-31 04:11:02.393845	2022-03-31 04:11:02.393845	\N	694	100	2013-01-01 00:00:00	Old Data Migration.
+2432	2022-03-31 04:11:02.597826	2022-03-31 04:11:02.597826	\N	695	793	2017-01-01 00:00:00	Old Data Migration.
+2433	2022-03-31 04:11:02.811206	2022-03-31 04:11:02.811206	\N	696	1000	2011-01-01 00:00:00	Old Data Migration.
+2434	2022-03-31 04:11:03.011197	2022-03-31 04:11:03.011197	\N	697	600	2013-01-01 00:00:00	Old Data Migration.
+2435	2022-03-31 04:11:03.203004	2022-03-31 04:11:03.203004	\N	698	75	2014-01-01 00:00:00	Old Data Migration.
+2436	2022-03-31 04:11:03.414463	2022-03-31 04:11:03.414463	\N	698	469	2015-01-01 00:00:00	Old Data Migration.
+2437	2022-03-31 04:11:03.62534	2022-03-31 04:11:03.62534	\N	698	383	2017-01-01 00:00:00	Old Data Migration.
+2438	2022-03-31 04:11:03.823944	2022-03-31 04:11:03.823944	\N	698	203	2021-09-01 00:00:00	Old Data Migration.
+2439	2022-03-31 04:11:04.022796	2022-03-31 04:11:04.022796	\N	699	476	2017-01-01 00:00:00	Old Data Migration.
+2440	2022-03-31 04:11:04.223417	2022-03-31 04:11:04.223417	\N	700	600	2011-01-01 00:00:00	Old Data Migration.
+2441	2022-03-31 04:11:04.421588	2022-03-31 04:11:04.421588	\N	700	150	2012-01-01 00:00:00	Old Data Migration.
+2442	2022-03-31 04:11:04.622347	2022-03-31 04:11:04.622347	\N	700	150	2013-01-01 00:00:00	Old Data Migration.
+2443	2022-03-31 04:11:04.825619	2022-03-31 04:11:04.825619	\N	701	1274	2019-01-01 00:00:00	Old Data Migration.
+2444	2022-03-31 04:11:05.032726	2022-03-31 04:11:05.032726	\N	701	153	2020-01-01 00:00:00	Old Data Migration.
+2445	2022-03-31 04:11:05.239993	2022-03-31 04:11:05.239993	\N	702	519	2015-01-01 00:00:00	Old Data Migration.
+2446	2022-03-31 04:11:05.449879	2022-03-31 04:11:05.449879	\N	702	393	2016-01-01 00:00:00	Old Data Migration.
+2447	2022-03-31 04:11:05.643828	2022-03-31 04:11:05.643828	\N	703	525	2014-01-01 00:00:00	Old Data Migration.
+2448	2022-03-31 04:11:05.836338	2022-03-31 04:11:05.836338	\N	703	411	2015-01-01 00:00:00	Old Data Migration.
+2449	2022-03-31 04:11:06.03325	2022-03-31 04:11:06.03325	\N	703	378	2018-01-01 00:00:00	Old Data Migration.
+2450	2022-03-31 04:11:06.237657	2022-03-31 04:11:06.237657	\N	704	1587	2019-01-01 00:00:00	Old Data Migration.
+2451	2022-03-31 04:11:06.442799	2022-03-31 04:11:06.442799	\N	706	338	2019-01-01 00:00:00	Old Data Migration.
+2452	2022-03-31 04:11:06.648076	2022-03-31 04:11:06.648076	\N	707	600	2011-01-01 00:00:00	Old Data Migration.
+2453	2022-03-31 04:11:06.845458	2022-03-31 04:11:06.845458	\N	707	225	2014-01-01 00:00:00	Old Data Migration.
+2454	2022-03-31 04:11:07.046869	2022-03-31 04:11:07.046869	\N	707	487	2017-01-01 00:00:00	Old Data Migration.
+2455	2022-03-31 04:11:07.25248	2022-03-31 04:11:07.25248	\N	707	1861	2018-01-01 00:00:00	Old Data Migration.
+2456	2022-03-31 04:11:07.452326	2022-03-31 04:11:07.452326	\N	708	585	2017-01-01 00:00:00	Old Data Migration.
+2457	2022-03-31 04:11:07.647114	2022-03-31 04:11:07.647114	\N	708	1685	2018-01-01 00:00:00	Old Data Migration.
+2458	2022-03-31 04:11:07.848917	2022-03-31 04:11:07.848917	\N	709	630	2019-01-01 00:00:00	Old Data Migration.
+2459	2022-03-31 04:11:08.046399	2022-03-31 04:11:08.046399	\N	710	1343	2019-01-01 00:00:00	Old Data Migration.
+2460	2022-03-31 04:11:08.241061	2022-03-31 04:11:08.241061	\N	711	778	2020-01-01 00:00:00	Old Data Migration.
+2461	2022-03-31 04:11:08.443003	2022-03-31 04:11:08.443003	\N	712	307	2016-01-01 00:00:00	Old Data Migration.
+2462	2022-03-31 04:11:08.640732	2022-03-31 04:11:08.640732	\N	712	347	2017-01-01 00:00:00	Old Data Migration.
+2463	2022-03-31 04:11:08.838998	2022-03-31 04:11:08.838998	\N	712	275	2018-01-01 00:00:00	Old Data Migration.
+2464	2022-03-31 04:11:09.032314	2022-03-31 04:11:09.032314	\N	713	800	2012-01-01 00:00:00	Old Data Migration.
+2465	2022-03-31 04:11:09.236963	2022-03-31 04:11:09.236963	\N	713	1103	2019-01-01 00:00:00	Old Data Migration.
+2466	2022-03-31 04:11:09.439149	2022-03-31 04:11:09.439149	\N	714	300	2014-01-01 00:00:00	Old Data Migration.
+2467	2022-03-31 04:11:09.626652	2022-03-31 04:11:09.626652	\N	714	317	2018-01-01 00:00:00	Old Data Migration.
+2468	2022-03-31 04:11:10.171268	2022-03-31 04:11:10.171268	\N	715	329	2016-01-01 00:00:00	Old Data Migration.
+2469	2022-03-31 04:11:10.457323	2022-03-31 04:11:10.457323	\N	715	289	2018-01-01 00:00:00	Old Data Migration.
+2470	2022-03-31 04:11:10.645142	2022-03-31 04:11:10.645142	\N	716	300	2013-01-01 00:00:00	Old Data Migration.
+2471	2022-03-31 04:11:10.844156	2022-03-31 04:11:10.844156	\N	716	636	2017-01-01 00:00:00	Old Data Migration.
+2472	2022-03-31 04:11:11.029332	2022-03-31 04:11:11.029332	\N	717	1333	2019-01-01 00:00:00	Old Data Migration.
+2473	2022-03-31 04:11:11.21936	2022-03-31 04:11:11.21936	\N	718	494	2016-01-01 00:00:00	Old Data Migration.
+2474	2022-03-31 04:11:11.415748	2022-03-31 04:11:11.415748	\N	719	1204	2019-01-01 00:00:00	Old Data Migration.
+2475	2022-03-31 04:11:11.620243	2022-03-31 04:11:11.620243	\N	719	373	2021-01-01 00:00:00	Old Data Migration.
+2476	2022-03-31 04:11:11.812682	2022-03-31 04:11:11.812682	\N	720	400	2013-01-01 00:00:00	Old Data Migration.
+2477	2022-03-31 04:11:12.02106	2022-03-31 04:11:12.02106	\N	720	150	2014-01-01 00:00:00	Old Data Migration.
+2478	2022-03-31 04:11:12.220219	2022-03-31 04:11:12.220219	\N	720	464	2016-01-01 00:00:00	Old Data Migration.
+2479	2022-03-31 04:11:12.419893	2022-03-31 04:11:12.419893	\N	720	1999	2018-01-01 00:00:00	Old Data Migration.
+2480	2022-03-31 04:11:12.615092	2022-03-31 04:11:12.615092	\N	721	732	2019-01-01 00:00:00	Old Data Migration.
+2481	2022-03-31 04:11:12.81632	2022-03-31 04:11:12.81632	\N	722	557	2015-01-01 00:00:00	Old Data Migration.
+2482	2022-03-31 04:11:13.018108	2022-03-31 04:11:13.018108	\N	722	547	2017-01-01 00:00:00	Old Data Migration.
+2483	2022-03-31 04:11:13.203991	2022-03-31 04:11:13.203991	\N	723	891	2017-01-01 00:00:00	Old Data Migration.
+2484	2022-03-31 04:11:13.396043	2022-03-31 04:11:13.396043	\N	724	1255	2019-01-01 00:00:00	Old Data Migration.
+2485	2022-03-31 04:11:13.591628	2022-03-31 04:11:13.591628	\N	725	456	2016-01-01 00:00:00	Old Data Migration.
+2486	2022-03-31 04:11:13.775128	2022-03-31 04:11:13.775128	\N	726	440	2016-01-01 00:00:00	Old Data Migration.
+2487	2022-03-31 04:11:13.964032	2022-03-31 04:11:13.964032	\N	727	341	2020-01-01 00:00:00	Old Data Migration.
+2488	2022-03-31 04:11:14.162608	2022-03-31 04:11:14.162608	\N	728	726	2020-01-01 00:00:00	Old Data Migration.
+2489	2022-03-31 04:11:14.353253	2022-03-31 04:11:14.353253	\N	729	650	2012-01-01 00:00:00	Old Data Migration.
+2490	2022-03-31 04:11:14.548064	2022-03-31 04:11:14.548064	\N	730	203	2021-09-01 00:00:00	Old Data Migration.
+2491	2022-03-31 04:11:14.738688	2022-03-31 04:11:14.738688	\N	731	25	2015-01-01 00:00:00	Old Data Migration.
+2492	2022-03-31 04:11:14.932886	2022-03-31 04:11:14.932886	\N	731	558	2017-01-01 00:00:00	Old Data Migration.
+2493	2022-03-31 04:11:15.127668	2022-03-31 04:11:15.127668	\N	731	491	2020-01-01 00:00:00	Old Data Migration.
+2494	2022-03-31 04:11:15.328661	2022-03-31 04:11:15.328661	\N	732	671	2015-01-01 00:00:00	Old Data Migration.
+2495	2022-03-31 04:11:15.517157	2022-03-31 04:11:15.517157	\N	732	351	2016-01-01 00:00:00	Old Data Migration.
+2496	2022-03-31 04:11:15.742391	2022-03-31 04:11:15.742391	\N	733	75	2014-01-01 00:00:00	Old Data Migration.
+2497	2022-03-31 04:11:15.928809	2022-03-31 04:11:15.928809	\N	734	225	2014-01-01 00:00:00	Old Data Migration.
+2498	2022-03-31 04:11:16.154442	2022-03-31 04:11:16.154442	\N	734	228	2021-09-01 00:00:00	Old Data Migration.
+2499	2022-03-31 04:11:16.35222	2022-03-31 04:11:16.35222	\N	735	358	2015-01-01 00:00:00	Old Data Migration.
+2500	2022-03-31 04:11:16.553192	2022-03-31 04:11:16.553192	\N	735	326	2016-01-01 00:00:00	Old Data Migration.
+2501	2022-03-31 04:11:16.751187	2022-03-31 04:11:16.751187	\N	735	412	2017-01-01 00:00:00	Old Data Migration.
+2502	2022-03-31 04:11:16.968327	2022-03-31 04:11:16.968327	\N	736	89	2020-01-01 00:00:00	Old Data Migration.
+2503	2022-03-31 04:11:17.162621	2022-03-31 04:11:17.162621	\N	737	278	2017-01-01 00:00:00	Old Data Migration.
+2504	2022-03-31 04:11:17.361065	2022-03-31 04:11:17.361065	\N	738	379	2018-01-01 00:00:00	Old Data Migration.
+2505	2022-03-31 04:11:17.551211	2022-03-31 04:11:17.551211	\N	739	500	2011-01-01 00:00:00	Old Data Migration.
+2506	2022-03-31 04:11:17.749547	2022-03-31 04:11:17.749547	\N	739	100	2012-01-01 00:00:00	Old Data Migration.
+2507	2022-03-31 04:11:17.952592	2022-03-31 04:11:17.952592	\N	740	1500	2013-01-01 00:00:00	Old Data Migration.
+2508	2022-03-31 04:11:18.155396	2022-03-31 04:11:18.155396	\N	741	150	2016-01-01 00:00:00	Old Data Migration.
+2509	2022-03-31 04:11:18.359772	2022-03-31 04:11:18.359772	\N	741	491	2018-01-01 00:00:00	Old Data Migration.
+2510	2022-03-31 04:11:18.557093	2022-03-31 04:11:18.557093	\N	741	394	2019-01-01 00:00:00	Old Data Migration.
+2511	2022-03-31 04:11:18.753877	2022-03-31 04:11:18.753877	\N	741	1436	2020-01-01 00:00:00	Old Data Migration.
+2512	2022-03-31 04:11:18.945574	2022-03-31 04:11:18.945574	\N	741	111	2021-01-01 00:00:00	Old Data Migration.
+2513	2022-03-31 04:11:19.144875	2022-03-31 04:11:19.144875	\N	742	300	2016-01-01 00:00:00	Old Data Migration.
+2514	2022-03-31 04:11:19.346844	2022-03-31 04:11:19.346844	\N	742	300	2017-01-01 00:00:00	Old Data Migration.
+2515	2022-03-31 04:11:19.560833	2022-03-31 04:11:19.560833	\N	742	211	2018-01-01 00:00:00	Old Data Migration.
+2516	2022-03-31 04:11:19.750569	2022-03-31 04:11:19.750569	\N	742	86	2021-01-01 00:00:00	Old Data Migration.
+2517	2022-03-31 04:11:19.943619	2022-03-31 04:11:19.943619	\N	742	102	2021-09-01 00:00:00	Old Data Migration.
+2518	2022-03-31 04:11:20.140377	2022-03-31 04:11:20.140377	\N	743	1600	2012-01-01 00:00:00	Old Data Migration.
+2519	2022-03-31 04:11:20.332967	2022-03-31 04:11:20.332967	\N	743	600	2014-01-01 00:00:00	Old Data Migration.
+2520	2022-03-31 04:11:20.521968	2022-03-31 04:11:20.521968	\N	743	150	2016-01-01 00:00:00	Old Data Migration.
+2521	2022-03-31 04:11:20.709764	2022-03-31 04:11:20.709764	\N	743	264	2020-01-01 00:00:00	Old Data Migration.
+2522	2022-03-31 04:11:20.910428	2022-03-31 04:11:20.910428	\N	743	454	2021-09-01 00:00:00	Old Data Migration.
+2523	2022-03-31 04:11:21.119439	2022-03-31 04:11:21.119439	\N	744	1600	2012-01-01 00:00:00	Old Data Migration.
+2524	2022-03-31 04:11:21.312156	2022-03-31 04:11:21.312156	\N	744	1952	2020-01-01 00:00:00	Old Data Migration.
+2525	2022-03-31 04:11:21.51259	2022-03-31 04:11:21.51259	\N	745	1500	2013-01-01 00:00:00	Old Data Migration.
+2526	2022-03-31 04:11:21.713658	2022-03-31 04:11:21.713658	\N	746	900	2014-01-01 00:00:00	Old Data Migration.
+2527	2022-03-31 04:11:21.919428	2022-03-31 04:11:21.919428	\N	746	300	2016-01-01 00:00:00	Old Data Migration.
+2528	2022-03-31 04:11:22.112651	2022-03-31 04:11:22.112651	\N	746	408	2018-01-01 00:00:00	Old Data Migration.
+2529	2022-03-31 04:11:22.314774	2022-03-31 04:11:22.314774	\N	746	336	2019-01-01 00:00:00	Old Data Migration.
+2530	2022-03-31 04:11:22.515614	2022-03-31 04:11:22.515614	\N	747	252	2019-01-01 00:00:00	Old Data Migration.
+2531	2022-03-31 04:11:22.719019	2022-03-31 04:11:22.719019	\N	747	723	2021-01-01 00:00:00	Old Data Migration.
+2532	2022-03-31 04:11:22.909445	2022-03-31 04:11:22.909445	\N	747	129	2021-09-01 00:00:00	Old Data Migration.
+2533	2022-03-31 04:11:23.107087	2022-03-31 04:11:23.107087	\N	748	700	2014-01-01 00:00:00	Old Data Migration.
+2534	2022-03-31 04:11:23.320793	2022-03-31 04:11:23.320793	\N	748	418	2017-01-01 00:00:00	Old Data Migration.
+2535	2022-03-31 04:11:23.514888	2022-03-31 04:11:23.514888	\N	748	389	2019-01-01 00:00:00	Old Data Migration.
+2536	2022-03-31 04:11:23.71302	2022-03-31 04:11:23.71302	\N	750	225	2016-01-01 00:00:00	Old Data Migration.
+2537	2022-03-31 04:11:23.902892	2022-03-31 04:11:23.902892	\N	750	361	2017-01-01 00:00:00	Old Data Migration.
+2538	2022-03-31 04:11:24.140484	2022-03-31 04:11:24.140484	\N	750	290	2019-01-01 00:00:00	Old Data Migration.
+2539	2022-03-31 04:11:24.467108	2022-03-31 04:11:24.467108	\N	751	458	2017-01-01 00:00:00	Old Data Migration.
+2540	2022-03-31 04:11:24.787769	2022-03-31 04:11:24.787769	\N	751	1528	2021-01-01 00:00:00	Old Data Migration.
+2541	2022-03-31 04:11:25.143199	2022-03-31 04:11:25.143199	\N	752	411	2017-01-01 00:00:00	Old Data Migration.
+2542	2022-03-31 04:11:25.417681	2022-03-31 04:11:25.417681	\N	752	298	2019-01-01 00:00:00	Old Data Migration.
+2543	2022-03-31 04:11:25.64282	2022-03-31 04:11:25.64282	\N	753	500	2014-01-01 00:00:00	Old Data Migration.
+2544	2022-03-31 04:11:25.837718	2022-03-31 04:11:25.837718	\N	754	75	2015-01-01 00:00:00	Old Data Migration.
+2545	2022-03-31 04:11:26.028584	2022-03-31 04:11:26.028584	\N	754	318	2017-01-01 00:00:00	Old Data Migration.
+2546	2022-03-31 04:11:26.227705	2022-03-31 04:11:26.227705	\N	754	722	2021-09-01 00:00:00	Old Data Migration.
+2547	2022-03-31 04:11:26.42078	2022-03-31 04:11:26.42078	\N	755	484	2018-01-01 00:00:00	Old Data Migration.
+2548	2022-03-31 04:11:26.616894	2022-03-31 04:11:26.616894	\N	755	724	2021-01-01 00:00:00	Old Data Migration.
+2549	2022-03-31 04:11:26.896484	2022-03-31 04:11:26.896484	\N	756	536	2018-01-01 00:00:00	Old Data Migration.
+2550	2022-03-31 04:11:28.11108	2022-03-31 04:11:28.11108	\N	756	386	2019-01-01 00:00:00	Old Data Migration.
+2551	2022-03-31 04:11:28.308084	2022-03-31 04:11:28.308084	\N	756	575	2021-09-01 00:00:00	Old Data Migration.
+2552	2022-03-31 04:11:28.49307	2022-03-31 04:11:28.49307	\N	757	497	2019-01-01 00:00:00	Old Data Migration.
+2553	2022-03-31 04:11:28.720982	2022-03-31 04:11:28.720982	\N	757	285	2020-01-01 00:00:00	Old Data Migration.
+2554	2022-03-31 04:11:28.904774	2022-03-31 04:11:28.904774	\N	757	111	2021-01-01 00:00:00	Old Data Migration.
+2555	2022-03-31 04:11:29.097083	2022-03-31 04:11:29.097083	\N	757	102	2021-09-01 00:00:00	Old Data Migration.
+2556	2022-03-31 04:11:29.286853	2022-03-31 04:11:29.286853	\N	758	160	2021-01-01 00:00:00	Old Data Migration.
+2557	2022-03-31 04:11:29.482884	2022-03-31 04:11:29.482884	\N	759	300	2017-01-01 00:00:00	Old Data Migration.
+2558	2022-03-31 04:11:29.676421	2022-03-31 04:11:29.676421	\N	759	235	2018-01-01 00:00:00	Old Data Migration.
+2559	2022-03-31 04:11:29.882943	2022-03-31 04:11:29.882943	\N	759	321	2019-01-01 00:00:00	Old Data Migration.
+2560	2022-03-31 04:11:30.086912	2022-03-31 04:11:30.086912	\N	759	309	2020-01-01 00:00:00	Old Data Migration.
+2561	2022-03-31 04:11:30.584872	2022-03-31 04:11:30.584872	\N	759	66	2021-01-01 00:00:00	Old Data Migration.
+2562	2022-03-31 04:11:30.773717	2022-03-31 04:11:30.773717	\N	759	92	2021-09-01 00:00:00	Old Data Migration.
+2563	2022-03-31 04:11:30.964154	2022-03-31 04:11:30.964154	\N	760	500	2013-01-01 00:00:00	Old Data Migration.
+2564	2022-03-31 04:11:31.156977	2022-03-31 04:11:31.156977	\N	760	73	2021-09-01 00:00:00	Old Data Migration.
+2565	2022-03-31 04:11:31.345101	2022-03-31 04:11:31.345101	\N	761	521	2018-01-01 00:00:00	Old Data Migration.
+2566	2022-03-31 04:11:31.539033	2022-03-31 04:11:31.539033	\N	761	447	2019-01-01 00:00:00	Old Data Migration.
+2567	2022-03-31 04:11:31.743778	2022-03-31 04:11:31.743778	\N	761	503	2021-01-01 00:00:00	Old Data Migration.
+2568	2022-03-31 04:11:31.963228	2022-03-31 04:11:31.963228	\N	762	501	2021-09-01 00:00:00	Old Data Migration.
+2569	2022-03-31 04:11:32.155919	2022-03-31 04:11:32.155919	\N	763	147	2019-01-01 00:00:00	Old Data Migration.
+2570	2022-03-31 04:11:32.348161	2022-03-31 04:11:32.348161	\N	764	800	2013-01-01 00:00:00	Old Data Migration.
+2571	2022-03-31 04:11:32.549114	2022-03-31 04:11:32.549114	\N	764	225	2015-01-01 00:00:00	Old Data Migration.
+2572	2022-03-31 04:11:32.740794	2022-03-31 04:11:32.740794	\N	764	419	2017-01-01 00:00:00	Old Data Migration.
+2573	2022-03-31 04:11:32.945658	2022-03-31 04:11:32.945658	\N	764	395	2019-01-01 00:00:00	Old Data Migration.
+2574	2022-03-31 04:11:33.167294	2022-03-31 04:11:33.167294	\N	764	1359	2021-01-01 00:00:00	Old Data Migration.
+2575	2022-03-31 04:11:33.370416	2022-03-31 04:11:33.370416	\N	765	478	2018-01-01 00:00:00	Old Data Migration.
+2576	2022-03-31 04:11:33.563446	2022-03-31 04:11:33.563446	\N	765	360	2021-01-01 00:00:00	Old Data Migration.
+2577	2022-03-31 04:11:33.756467	2022-03-31 04:11:33.756467	\N	766	342	2018-01-01 00:00:00	Old Data Migration.
+2578	2022-03-31 04:11:33.952166	2022-03-31 04:11:33.952166	\N	766	982	2020-01-01 00:00:00	Old Data Migration.
+2579	2022-03-31 04:11:34.149009	2022-03-31 04:11:34.149009	\N	767	800	2013-01-01 00:00:00	Old Data Migration.
+2580	2022-03-31 04:11:34.3475	2022-03-31 04:11:34.3475	\N	767	400	2014-01-01 00:00:00	Old Data Migration.
+2581	2022-03-31 04:11:34.55038	2022-03-31 04:11:34.55038	\N	767	545	2017-01-01 00:00:00	Old Data Migration.
+2582	2022-03-31 04:11:34.741288	2022-03-31 04:11:34.741288	\N	768	602	2017-01-01 00:00:00	Old Data Migration.
+2583	2022-03-31 04:11:34.930976	2022-03-31 04:11:34.930976	\N	768	358	2018-01-01 00:00:00	Old Data Migration.
+2584	2022-03-31 04:11:35.122951	2022-03-31 04:11:35.122951	\N	768	50	2019-01-01 00:00:00	Old Data Migration.
+2585	2022-03-31 04:11:35.321856	2022-03-31 04:11:35.321856	\N	768	1299	2020-01-01 00:00:00	Old Data Migration.
+2586	2022-03-31 04:11:35.523537	2022-03-31 04:11:35.523537	\N	769	1255	2020-01-01 00:00:00	Old Data Migration.
+2587	2022-03-31 04:11:35.716755	2022-03-31 04:11:35.716755	\N	770	75	2015-01-01 00:00:00	Old Data Migration.
+2588	2022-03-31 04:11:35.915336	2022-03-31 04:11:35.915336	\N	771	225	2015-01-01 00:00:00	Old Data Migration.
+2589	2022-03-31 04:11:36.11141	2022-03-31 04:11:36.11141	\N	771	1231	2020-01-01 00:00:00	Old Data Migration.
+2590	2022-03-31 04:11:36.513518	2022-03-31 04:11:36.513518	\N	772	468	2018-01-01 00:00:00	Old Data Migration.
+2591	2022-03-31 04:11:36.876873	2022-03-31 04:11:36.876873	\N	772	556	2021-01-01 00:00:00	Old Data Migration.
+2592	2022-03-31 04:11:37.155268	2022-03-31 04:11:37.155268	\N	773	700	2014-01-01 00:00:00	Old Data Migration.
+2593	2022-03-31 04:11:37.57512	2022-03-31 04:11:37.57512	\N	773	203	2021-01-01 00:00:00	Old Data Migration.
+2594	2022-03-31 04:11:37.940462	2022-03-31 04:11:37.940462	\N	774	225	2015-01-01 00:00:00	Old Data Migration.
+2595	2022-03-31 04:11:38.236288	2022-03-31 04:11:38.236288	\N	774	247	2017-01-01 00:00:00	Old Data Migration.
+2596	2022-03-31 04:11:38.433017	2022-03-31 04:11:38.433017	\N	774	311	2018-01-01 00:00:00	Old Data Migration.
+2597	2022-03-31 04:11:38.621037	2022-03-31 04:11:38.621037	\N	774	284	2019-01-01 00:00:00	Old Data Migration.
+2598	2022-03-31 04:11:38.804508	2022-03-31 04:11:38.804508	\N	774	685	2021-01-01 00:00:00	Old Data Migration.
+2599	2022-03-31 04:11:38.998374	2022-03-31 04:11:38.998374	\N	774	150	2021-09-01 00:00:00	Old Data Migration.
+2600	2022-03-31 04:11:39.218269	2022-03-31 04:11:39.218269	\N	775	721	2020-01-01 00:00:00	Old Data Migration.
+2601	2022-03-31 04:11:39.41654	2022-03-31 04:11:39.41654	\N	776	372	2017-01-01 00:00:00	Old Data Migration.
+2602	2022-03-31 04:11:39.625643	2022-03-31 04:11:39.625643	\N	777	109	2021-09-01 00:00:00	Old Data Migration.
+2603	2022-03-31 04:11:39.824255	2022-03-31 04:11:39.824255	\N	778	225	2015-01-01 00:00:00	Old Data Migration.
+2604	2022-03-31 04:11:40.035712	2022-03-31 04:11:40.035712	\N	778	1288	2020-01-01 00:00:00	Old Data Migration.
+2605	2022-03-31 04:11:40.229291	2022-03-31 04:11:40.229291	\N	778	79	2021-09-01 00:00:00	Old Data Migration.
+2606	2022-03-31 04:11:40.430794	2022-03-31 04:11:40.430794	\N	779	113	2021-09-01 00:00:00	Old Data Migration.
+2607	2022-03-31 04:11:40.625147	2022-03-31 04:11:40.625147	\N	780	591	2018-01-01 00:00:00	Old Data Migration.
+2608	2022-03-31 04:11:40.823333	2022-03-31 04:11:40.823333	\N	780	893	2019-01-01 00:00:00	Old Data Migration.
+2609	2022-03-31 04:11:41.020558	2022-03-31 04:11:41.020558	\N	780	1483	2020-01-01 00:00:00	Old Data Migration.
+2610	2022-03-31 04:11:41.219592	2022-03-31 04:11:41.219592	\N	781	1700	2011-01-01 00:00:00	Old Data Migration.
+2611	2022-03-31 04:11:42.410922	2022-03-31 04:11:42.410922	\N	781	400	2013-01-01 00:00:00	Old Data Migration.
+2612	2022-03-31 04:11:42.614233	2022-03-31 04:11:42.614233	\N	781	225	2015-01-01 00:00:00	Old Data Migration.
+2613	2022-03-31 04:11:42.81648	2022-03-31 04:11:42.81648	\N	781	346	2017-01-01 00:00:00	Old Data Migration.
+2614	2022-03-31 04:11:43.015216	2022-03-31 04:11:43.015216	\N	781	1431	2020-01-01 00:00:00	Old Data Migration.
+2615	2022-03-31 04:11:43.211142	2022-03-31 04:11:43.211142	\N	781	516	2021-01-01 00:00:00	Old Data Migration.
+2616	2022-03-31 04:11:43.406637	2022-03-31 04:11:43.406637	\N	782	525	2015-01-01 00:00:00	Old Data Migration.
+2617	2022-03-31 04:11:43.600185	2022-03-31 04:11:43.600185	\N	782	190	2020-01-01 00:00:00	Old Data Migration.
+2618	2022-03-31 04:11:43.803044	2022-03-31 04:11:43.803044	\N	783	1307	2020-01-01 00:00:00	Old Data Migration.
+2619	2022-03-31 04:11:44.327974	2022-03-31 04:11:44.327974	\N	784	375	2015-01-01 00:00:00	Old Data Migration.
+2620	2022-03-31 04:11:44.521236	2022-03-31 04:11:44.521236	\N	784	67	2021-09-01 00:00:00	Old Data Migration.
+2621	2022-03-31 04:11:44.705284	2022-03-31 04:11:44.705284	\N	786	352	2017-01-01 00:00:00	Old Data Migration.
+2622	2022-03-31 04:11:44.893597	2022-03-31 04:11:44.893597	\N	787	900	2012-01-01 00:00:00	Old Data Migration.
+2623	2022-03-31 04:11:45.091957	2022-03-31 04:11:45.091957	\N	787	1069	2019-01-01 00:00:00	Old Data Migration.
+2624	2022-03-31 04:11:45.316749	2022-03-31 04:11:45.316749	\N	787	180	2020-01-01 00:00:00	Old Data Migration.
+2625	2022-03-31 04:11:45.521971	2022-03-31 04:11:45.521971	\N	788	1570	2018-01-01 00:00:00	Old Data Migration.
+2626	2022-03-31 04:11:45.75914	2022-03-31 04:11:45.75914	\N	788	205	2019-01-01 00:00:00	Old Data Migration.
+2627	2022-03-31 04:11:45.985241	2022-03-31 04:11:45.985241	\N	789	451	2015-01-01 00:00:00	Old Data Migration.
+2628	2022-03-31 04:11:46.183166	2022-03-31 04:11:46.183166	\N	790	251	2015-01-01 00:00:00	Old Data Migration.
+2629	2022-03-31 04:11:46.371003	2022-03-31 04:11:46.371003	\N	790	254	2019-01-01 00:00:00	Old Data Migration.
+2630	2022-03-31 04:11:46.564614	2022-03-31 04:11:46.564614	\N	791	429	2015-01-01 00:00:00	Old Data Migration.
+2631	2022-03-31 04:11:46.775492	2022-03-31 04:11:46.775492	\N	791	683	2017-01-01 00:00:00	Old Data Migration.
+2632	2022-03-31 04:11:46.967966	2022-03-31 04:11:46.967966	\N	791	931	2019-01-01 00:00:00	Old Data Migration.
+2633	2022-03-31 04:11:47.176987	2022-03-31 04:11:47.176987	\N	792	1000	2012-01-01 00:00:00	Old Data Migration.
+2634	2022-03-31 04:11:47.374506	2022-03-31 04:11:47.374506	\N	792	331	2015-01-01 00:00:00	Old Data Migration.
+2635	2022-03-31 04:11:47.570969	2022-03-31 04:11:47.570969	\N	793	375	2014-01-01 00:00:00	Old Data Migration.
+2636	2022-03-31 04:11:47.769821	2022-03-31 04:11:47.769821	\N	793	283	2015-01-01 00:00:00	Old Data Migration.
+2637	2022-03-31 04:11:47.960961	2022-03-31 04:11:47.960961	\N	793	396	2018-01-01 00:00:00	Old Data Migration.
+2638	2022-03-31 04:11:48.402472	2022-03-31 04:11:48.402472	\N	794	800	2011-01-01 00:00:00	Old Data Migration.
+2639	2022-03-31 04:11:48.901175	2022-03-31 04:11:48.901175	\N	794	270	2014-01-01 00:00:00	Old Data Migration.
+2640	2022-03-31 04:11:49.268874	2022-03-31 04:11:49.268874	\N	795	500	2013-01-01 00:00:00	Old Data Migration.
+2641	2022-03-31 04:11:49.605877	2022-03-31 04:11:49.605877	\N	795	513	2017-01-01 00:00:00	Old Data Migration.
+2642	2022-03-31 04:11:49.829448	2022-03-31 04:11:49.829448	\N	796	324	2019-01-01 00:00:00	Old Data Migration.
+2643	2022-03-31 04:11:50.028948	2022-03-31 04:11:50.028948	\N	796	240	2020-01-01 00:00:00	Old Data Migration.
+2644	2022-03-31 04:11:50.228515	2022-03-31 04:11:50.228515	\N	796	47	2021-09-01 00:00:00	Old Data Migration.
+2645	2022-03-31 04:11:50.454422	2022-03-31 04:11:50.454422	\N	797	500	2013-01-01 00:00:00	Old Data Migration.
+2646	2022-03-31 04:11:50.680796	2022-03-31 04:11:50.680796	\N	797	175	2014-01-01 00:00:00	Old Data Migration.
+2647	2022-03-31 04:11:50.890571	2022-03-31 04:11:50.890571	\N	797	203	2021-09-01 00:00:00	Old Data Migration.
+2648	2022-03-31 04:11:51.081052	2022-03-31 04:11:51.081052	\N	798	1238	2018-01-01 00:00:00	Old Data Migration.
+2649	2022-03-31 04:11:51.274914	2022-03-31 04:11:51.274914	\N	799	413	2017-01-01 00:00:00	Old Data Migration.
+2650	2022-03-31 04:11:51.470255	2022-03-31 04:11:51.470255	\N	799	203	2021-09-01 00:00:00	Old Data Migration.
+2651	2022-03-31 04:11:51.661058	2022-03-31 04:11:51.661058	\N	800	460	2021-01-01 00:00:00	Old Data Migration.
+2652	2022-03-31 04:11:51.854719	2022-03-31 04:11:51.854719	\N	801	370	2017-01-01 00:00:00	Old Data Migration.
+2653	2022-03-31 04:11:52.071029	2022-03-31 04:11:52.071029	\N	801	289	2021-09-01 00:00:00	Old Data Migration.
+2654	2022-03-31 04:11:52.261408	2022-03-31 04:11:52.261408	\N	802	289	2021-09-01 00:00:00	Old Data Migration.
+2655	2022-03-31 04:11:52.462311	2022-03-31 04:11:52.462311	\N	803	900	2012-01-01 00:00:00	Old Data Migration.
+2656	2022-03-31 04:11:52.654316	2022-03-31 04:11:52.654316	\N	803	250	2013-01-01 00:00:00	Old Data Migration.
+2657	2022-03-31 04:11:52.854515	2022-03-31 04:11:52.854515	\N	803	225	2014-01-01 00:00:00	Old Data Migration.
+2658	2022-03-31 04:11:53.043679	2022-03-31 04:11:53.043679	\N	804	476	2016-01-01 00:00:00	Old Data Migration.
+2659	2022-03-31 04:11:53.231874	2022-03-31 04:11:53.231874	\N	804	516	2020-01-01 00:00:00	Old Data Migration.
+2660	2022-03-31 04:11:53.423283	2022-03-31 04:11:53.423283	\N	805	429	2017-01-01 00:00:00	Old Data Migration.
+2661	2022-03-31 04:11:53.610636	2022-03-31 04:11:53.610636	\N	806	50	2012-01-01 00:00:00	Old Data Migration.
+2662	2022-03-31 04:11:53.806507	2022-03-31 04:11:53.806507	\N	807	900	2012-01-01 00:00:00	Old Data Migration.
+2663	2022-03-31 04:11:54.335932	2022-03-31 04:11:54.335932	\N	808	354	2017-01-01 00:00:00	Old Data Migration.
+2664	2022-03-31 04:11:54.528118	2022-03-31 04:11:54.528118	\N	808	1035	2018-01-01 00:00:00	Old Data Migration.
+2665	2022-03-31 04:11:54.726713	2022-03-31 04:11:54.726713	\N	811	600	2012-01-01 00:00:00	Old Data Migration.
+2666	2022-03-31 04:11:54.925967	2022-03-31 04:11:54.925967	\N	812	494	2020-01-01 00:00:00	Old Data Migration.
+2667	2022-03-31 04:11:55.132685	2022-03-31 04:11:55.132685	\N	813	288	2021-09-01 00:00:00	Old Data Migration.
+2668	2022-03-31 04:11:55.337916	2022-03-31 04:11:55.337916	\N	814	341	2016-01-01 00:00:00	Old Data Migration.
+2669	2022-03-31 04:11:55.541196	2022-03-31 04:11:55.541196	\N	816	354	2019-01-01 00:00:00	Old Data Migration.
+2670	2022-03-31 04:11:55.751054	2022-03-31 04:11:55.751054	\N	817	400	2012-01-01 00:00:00	Old Data Migration.
+2671	2022-03-31 04:11:55.963945	2022-03-31 04:11:55.963945	\N	818	3169	2018-01-01 00:00:00	Old Data Migration.
+2672	2022-03-31 04:11:56.172786	2022-03-31 04:11:56.172786	\N	818	372	2019-01-01 00:00:00	Old Data Migration.
+2673	2022-03-31 04:11:56.38072	2022-03-31 04:11:56.38072	\N	819	473	2016-01-01 00:00:00	Old Data Migration.
+2674	2022-03-31 04:11:56.586861	2022-03-31 04:11:56.586861	\N	820	496	2015-01-01 00:00:00	Old Data Migration.
+2675	2022-03-31 04:11:56.974924	2022-03-31 04:11:56.974924	\N	820	181	2016-01-01 00:00:00	Old Data Migration.
+2676	2022-03-31 04:11:57.18715	2022-03-31 04:11:57.18715	\N	820	24	2020-01-01 00:00:00	Old Data Migration.
+2677	2022-03-31 04:11:57.3813	2022-03-31 04:11:57.3813	\N	821	118	2019-01-01 00:00:00	Old Data Migration.
+2678	2022-03-31 04:11:57.572763	2022-03-31 04:11:57.572763	\N	822	700	2011-01-01 00:00:00	Old Data Migration.
+2679	2022-03-31 04:11:57.753872	2022-03-31 04:11:57.753872	\N	822	450	2013-01-01 00:00:00	Old Data Migration.
+2680	2022-03-31 04:11:57.950674	2022-03-31 04:11:57.950674	\N	822	225	2014-01-01 00:00:00	Old Data Migration.
+2681	2022-03-31 04:11:58.157064	2022-03-31 04:11:58.157064	\N	822	355	2015-01-01 00:00:00	Old Data Migration.
+2682	2022-03-31 04:11:58.346094	2022-03-31 04:11:58.346094	\N	822	323	2020-01-01 00:00:00	Old Data Migration.
+2683	2022-03-31 04:11:58.53444	2022-03-31 04:11:58.53444	\N	823	553	2017-01-01 00:00:00	Old Data Migration.
+2684	2022-03-31 04:11:58.722399	2022-03-31 04:11:58.722399	\N	824	684	2017-01-01 00:00:00	Old Data Migration.
+2685	2022-03-31 04:11:58.912734	2022-03-31 04:11:58.912734	\N	824	450	2020-01-01 00:00:00	Old Data Migration.
+2686	2022-03-31 04:11:59.11867	2022-03-31 04:11:59.11867	\N	825	477	2016-01-01 00:00:00	Old Data Migration.
+2687	2022-03-31 04:11:59.321402	2022-03-31 04:11:59.321402	\N	825	1145	2019-01-01 00:00:00	Old Data Migration.
+2688	2022-03-31 04:11:59.526249	2022-03-31 04:11:59.526249	\N	826	1436	2019-01-01 00:00:00	Old Data Migration.
+2689	2022-03-31 04:11:59.732009	2022-03-31 04:11:59.732009	\N	827	361	2019-01-01 00:00:00	Old Data Migration.
+2690	2022-03-31 04:11:59.921197	2022-03-31 04:11:59.921197	\N	827	366	2020-01-01 00:00:00	Old Data Migration.
+2691	2022-03-31 04:12:00.119754	2022-03-31 04:12:00.119754	\N	827	558	2021-01-01 00:00:00	Old Data Migration.
+2692	2022-03-31 04:12:00.324752	2022-03-31 04:12:00.324752	\N	828	26	2017-01-01 00:00:00	Old Data Migration.
+2693	2022-03-31 04:12:00.522055	2022-03-31 04:12:00.522055	\N	829	800	2011-01-01 00:00:00	Old Data Migration.
+2694	2022-03-31 04:12:00.72074	2022-03-31 04:12:00.72074	\N	829	200	2012-01-01 00:00:00	Old Data Migration.
+2695	2022-03-31 04:12:00.916305	2022-03-31 04:12:00.916305	\N	829	1391	2019-01-01 00:00:00	Old Data Migration.
+2696	2022-03-31 04:12:01.129327	2022-03-31 04:12:01.129327	\N	829	47	2021-09-01 00:00:00	Old Data Migration.
+2697	2022-03-31 04:12:01.327914	2022-03-31 04:12:01.327914	\N	830	1439	2019-01-01 00:00:00	Old Data Migration.
+2698	2022-03-31 04:12:01.5339	2022-03-31 04:12:01.5339	\N	831	822	2020-01-01 00:00:00	Old Data Migration.
+2699	2022-03-31 04:12:01.754752	2022-03-31 04:12:01.754752	\N	832	173	2016-01-01 00:00:00	Old Data Migration.
+2700	2022-03-31 04:12:01.982624	2022-03-31 04:12:01.982624	\N	832	178	2020-01-01 00:00:00	Old Data Migration.
+2701	2022-03-31 04:12:02.188467	2022-03-31 04:12:02.188467	\N	833	371	2016-01-01 00:00:00	Old Data Migration.
+2702	2022-03-31 04:12:02.38283	2022-03-31 04:12:02.38283	\N	833	496	2020-01-01 00:00:00	Old Data Migration.
+2703	2022-03-31 04:12:02.574007	2022-03-31 04:12:02.574007	\N	833	47	2021-09-01 00:00:00	Old Data Migration.
+2704	2022-03-31 04:12:02.768874	2022-03-31 04:12:02.768874	\N	834	710	2013-01-01 00:00:00	Old Data Migration.
+2705	2022-03-31 04:12:02.96938	2022-03-31 04:12:02.96938	\N	835	580	2015-01-01 00:00:00	Old Data Migration.
+2706	2022-03-31 04:12:03.170625	2022-03-31 04:12:03.170625	\N	835	1007	2018-01-01 00:00:00	Old Data Migration.
+2707	2022-03-31 04:12:03.372415	2022-03-31 04:12:03.372415	\N	836	1282	2018-01-01 00:00:00	Old Data Migration.
+2708	2022-03-31 04:12:03.567248	2022-03-31 04:12:03.567248	\N	837	600	2013-01-01 00:00:00	Old Data Migration.
+2709	2022-03-31 04:12:03.773019	2022-03-31 04:12:03.773019	\N	837	351	2017-01-01 00:00:00	Old Data Migration.
+2710	2022-03-31 04:12:03.974493	2022-03-31 04:12:03.974493	\N	837	91	2018-01-01 00:00:00	Old Data Migration.
+2711	2022-03-31 04:12:04.790591	2022-03-31 04:12:04.790591	\N	838	100	2013-01-01 00:00:00	Old Data Migration.
+2712	2022-03-31 04:12:05.06618	2022-03-31 04:12:05.06618	\N	839	100	2013-01-01 00:00:00	Old Data Migration.
+2713	2022-03-31 04:12:05.403928	2022-03-31 04:12:05.403928	\N	840	840	2020-01-01 00:00:00	Old Data Migration.
+2714	2022-03-31 04:12:05.827407	2022-03-31 04:12:05.827407	\N	841	1200	2012-01-01 00:00:00	Old Data Migration.
+2715	2022-03-31 04:12:06.140989	2022-03-31 04:12:06.140989	\N	841	469	2016-01-01 00:00:00	Old Data Migration.
+2716	2022-03-31 04:12:06.337115	2022-03-31 04:12:06.337115	\N	842	823	2019-01-01 00:00:00	Old Data Migration.
+2717	2022-03-31 04:12:06.535072	2022-03-31 04:12:06.535072	\N	843	700	2012-01-01 00:00:00	Old Data Migration.
+2718	2022-03-31 04:12:06.726803	2022-03-31 04:12:06.726803	\N	844	500	2012-01-01 00:00:00	Old Data Migration.
+2719	2022-03-31 04:12:06.934554	2022-03-31 04:12:06.934554	\N	844	225	2014-01-01 00:00:00	Old Data Migration.
+2720	2022-03-31 04:12:07.123067	2022-03-31 04:12:07.123067	\N	845	452	2017-01-01 00:00:00	Old Data Migration.
+2721	2022-03-31 04:12:07.309269	2022-03-31 04:12:07.309269	\N	845	494	2020-01-01 00:00:00	Old Data Migration.
+2722	2022-03-31 04:12:07.505977	2022-03-31 04:12:07.505977	\N	845	353	2021-01-01 00:00:00	Old Data Migration.
+2723	2022-03-31 04:12:07.702848	2022-03-31 04:12:07.702848	\N	846	225	2014-01-01 00:00:00	Old Data Migration.
+2724	2022-03-31 04:12:07.888611	2022-03-31 04:12:07.888611	\N	846	528	2020-01-01 00:00:00	Old Data Migration.
+2725	2022-03-31 04:12:08.078633	2022-03-31 04:12:08.078633	\N	846	49	2021-09-01 00:00:00	Old Data Migration.
+2726	2022-03-31 04:12:08.272666	2022-03-31 04:12:08.272666	\N	849	462	2016-01-01 00:00:00	Old Data Migration.
+2727	2022-03-31 04:12:08.464635	2022-03-31 04:12:08.464635	\N	849	502	2020-01-01 00:00:00	Old Data Migration.
+2728	2022-03-31 04:12:08.654846	2022-03-31 04:12:08.654846	\N	849	47	2021-09-01 00:00:00	Old Data Migration.
+2729	2022-03-31 04:12:08.844946	2022-03-31 04:12:08.844946	\N	850	300	2014-01-01 00:00:00	Old Data Migration.
+2730	2022-03-31 04:12:09.045859	2022-03-31 04:12:09.045859	\N	850	325	2015-01-01 00:00:00	Old Data Migration.
+2731	2022-03-31 04:12:09.244208	2022-03-31 04:12:09.244208	\N	851	375	2017-01-01 00:00:00	Old Data Migration.
+2732	2022-03-31 04:12:09.444603	2022-03-31 04:12:09.444603	\N	851	951	2018-01-01 00:00:00	Old Data Migration.
+2733	2022-03-31 04:12:09.774853	2022-03-31 04:12:09.774853	\N	852	539	2017-01-01 00:00:00	Old Data Migration.
+2734	2022-03-31 04:12:10.233173	2022-03-31 04:12:10.233173	\N	852	575	2020-01-01 00:00:00	Old Data Migration.
+2735	2022-03-31 04:12:10.730741	2022-03-31 04:12:10.730741	\N	853	118	2019-01-01 00:00:00	Old Data Migration.
+2736	2022-03-31 04:12:10.953549	2022-03-31 04:12:10.953549	\N	854	538	2017-01-01 00:00:00	Old Data Migration.
+2737	2022-03-31 04:12:11.411029	2022-03-31 04:12:11.411029	\N	854	1403	2018-01-01 00:00:00	Old Data Migration.
+2738	2022-03-31 04:12:11.696457	2022-03-31 04:12:11.696457	\N	855	443	2015-01-01 00:00:00	Old Data Migration.
+2739	2022-03-31 04:12:12.036361	2022-03-31 04:12:12.036361	\N	855	1326	2019-01-01 00:00:00	Old Data Migration.
+2740	2022-03-31 04:12:12.340278	2022-03-31 04:12:12.340278	\N	856	470	2015-01-01 00:00:00	Old Data Migration.
+2741	2022-03-31 04:12:12.548877	2022-03-31 04:12:12.548877	\N	857	250	2013-01-01 00:00:00	Old Data Migration.
+2742	2022-03-31 04:12:12.743059	2022-03-31 04:12:12.743059	\N	858	528	2015-01-01 00:00:00	Old Data Migration.
+2743	2022-03-31 04:12:13.050593	2022-03-31 04:12:13.050593	\N	858	270	2017-01-01 00:00:00	Old Data Migration.
+2744	2022-03-31 04:12:13.362641	2022-03-31 04:12:13.362641	\N	859	1917	2018-01-01 00:00:00	Old Data Migration.
+2745	2022-03-31 04:12:13.574232	2022-03-31 04:12:13.574232	\N	860	1500	2011-01-01 00:00:00	Old Data Migration.
+2746	2022-03-31 04:12:13.768243	2022-03-31 04:12:13.768243	\N	860	461	2016-01-01 00:00:00	Old Data Migration.
+2747	2022-03-31 04:12:14.066807	2022-03-31 04:12:14.066807	\N	860	495	2020-01-01 00:00:00	Old Data Migration.
+2748	2022-03-31 04:12:14.489374	2022-03-31 04:12:14.489374	\N	861	315	2015-01-01 00:00:00	Old Data Migration.
+2749	2022-03-31 04:12:14.698746	2022-03-31 04:12:14.698746	\N	861	107	2020-01-01 00:00:00	Old Data Migration.
+2750	2022-03-31 04:12:15.065351	2022-03-31 04:12:15.065351	\N	862	651	2015-01-01 00:00:00	Old Data Migration.
+2751	2022-03-31 04:12:15.273249	2022-03-31 04:12:15.273249	\N	862	361	2016-01-01 00:00:00	Old Data Migration.
+2752	2022-03-31 04:12:15.75674	2022-03-31 04:12:15.75674	\N	862	582	2017-01-01 00:00:00	Old Data Migration.
+2753	2022-03-31 04:12:16.136426	2022-03-31 04:12:16.136426	\N	862	47	2021-09-01 00:00:00	Old Data Migration.
+2754	2022-03-31 04:12:16.552034	2022-03-31 04:12:16.552034	\N	863	1500	2011-01-01 00:00:00	Old Data Migration.
+2755	2022-03-31 04:12:16.756548	2022-03-31 04:12:16.756548	\N	863	1583	2018-01-01 00:00:00	Old Data Migration.
+2756	2022-03-31 04:12:17.156103	2022-03-31 04:12:17.156103	\N	863	47	2021-09-01 00:00:00	Old Data Migration.
+2757	2022-03-31 04:12:17.390932	2022-03-31 04:12:17.390932	\N	864	1623	2018-01-01 00:00:00	Old Data Migration.
+2758	2022-03-31 04:12:17.663809	2022-03-31 04:12:17.663809	\N	865	300	2012-01-01 00:00:00	Old Data Migration.
+2759	2022-03-31 04:12:17.864534	2022-03-31 04:12:17.864534	\N	866	1198	2019-01-01 00:00:00	Old Data Migration.
+2760	2022-03-31 04:12:18.223827	2022-03-31 04:12:18.223827	\N	867	3000	2011-01-01 00:00:00	Old Data Migration.
+2761	2022-03-31 04:12:18.436907	2022-03-31 04:12:18.436907	\N	867	400	2012-01-01 00:00:00	Old Data Migration.
+2762	2022-03-31 04:12:18.735008	2022-03-31 04:12:18.735008	\N	867	225	2014-01-01 00:00:00	Old Data Migration.
+2763	2022-03-31 04:12:18.940708	2022-03-31 04:12:18.940708	\N	867	475	2020-01-01 00:00:00	Old Data Migration.
+2764	2022-03-31 04:12:19.309751	2022-03-31 04:12:19.309751	\N	868	483	2017-01-01 00:00:00	Old Data Migration.
+2765	2022-03-31 04:12:19.596564	2022-03-31 04:12:19.596564	\N	868	203	2021-09-01 00:00:00	Old Data Migration.
+2766	2022-03-31 04:12:19.813337	2022-03-31 04:12:19.813337	\N	869	396	2016-01-01 00:00:00	Old Data Migration.
+2767	2022-03-31 04:12:20.022223	2022-03-31 04:12:20.022223	\N	869	1375	2018-01-01 00:00:00	Old Data Migration.
+2768	2022-03-31 04:12:21.489514	2022-03-31 04:12:21.489514	\N	871	700	2011-01-01 00:00:00	Old Data Migration.
+2769	2022-03-31 04:12:21.80368	2022-03-31 04:12:21.80368	\N	871	150	2014-01-01 00:00:00	Old Data Migration.
+2770	2022-03-31 04:12:22.017241	2022-03-31 04:12:22.017241	\N	871	1040	2019-01-01 00:00:00	Old Data Migration.
+2771	2022-03-31 04:12:22.390371	2022-03-31 04:12:22.390371	\N	871	181	2020-01-01 00:00:00	Old Data Migration.
+2772	2022-03-31 04:12:22.609085	2022-03-31 04:12:22.609085	\N	871	43	2021-09-01 00:00:00	Old Data Migration.
+2773	2022-03-31 04:12:22.896162	2022-03-31 04:12:22.896162	\N	874	1500	2011-01-01 00:00:00	Old Data Migration.
+2774	2022-03-31 04:12:23.144338	2022-03-31 04:12:23.144338	\N	875	1300	2012-01-01 00:00:00	Old Data Migration.
+2775	2022-03-31 04:12:23.507949	2022-03-31 04:12:23.507949	\N	875	901	2018-01-01 00:00:00	Old Data Migration.
+2776	2022-03-31 04:12:23.857586	2022-03-31 04:12:23.857586	\N	876	1500	2011-01-01 00:00:00	Old Data Migration.
+2777	2022-03-31 04:12:24.067779	2022-03-31 04:12:24.067779	\N	877	361	2020-01-01 00:00:00	Old Data Migration.
+2778	2022-03-31 04:12:24.448514	2022-03-31 04:12:24.448514	\N	878	534	2015-01-01 00:00:00	Old Data Migration.
+2779	2022-03-31 04:12:24.840691	2022-03-31 04:12:24.840691	\N	878	289	2016-01-01 00:00:00	Old Data Migration.
+2780	2022-03-31 04:12:25.04966	2022-03-31 04:12:25.04966	\N	878	414	2017-01-01 00:00:00	Old Data Migration.
+2781	2022-03-31 04:12:25.283262	2022-03-31 04:12:25.283262	\N	879	150	2014-01-01 00:00:00	Old Data Migration.
+2782	2022-03-31 04:12:25.672216	2022-03-31 04:12:25.672216	\N	880	568	2017-01-01 00:00:00	Old Data Migration.
+2783	2022-03-31 04:12:25.975245	2022-03-31 04:12:25.975245	\N	881	563	2015-01-01 00:00:00	Old Data Migration.
+2784	2022-03-31 04:12:26.228261	2022-03-31 04:12:26.228261	\N	881	353	2017-01-01 00:00:00	Old Data Migration.
+2785	2022-03-31 04:12:26.621492	2022-03-31 04:12:26.621492	\N	881	1336	2019-01-01 00:00:00	Old Data Migration.
+2786	2022-03-31 04:12:27.029089	2022-03-31 04:12:27.029089	\N	881	47	2021-09-01 00:00:00	Old Data Migration.
+2787	2022-03-31 04:12:28.151919	2022-03-31 04:12:28.151919	\N	883	525	2014-01-01 00:00:00	Old Data Migration.
+2788	2022-03-31 04:12:28.364426	2022-03-31 04:12:28.364426	\N	884	700	2012-01-01 00:00:00	Old Data Migration.
+2789	2022-03-31 04:12:28.736543	2022-03-31 04:12:28.736543	\N	884	181	2020-01-01 00:00:00	Old Data Migration.
+2790	2022-03-31 04:12:29.033597	2022-03-31 04:12:29.033597	\N	885	225	2014-01-01 00:00:00	Old Data Migration.
+2791	2022-03-31 04:12:29.236144	2022-03-31 04:12:29.236144	\N	885	451	2015-01-01 00:00:00	Old Data Migration.
+2792	2022-03-31 04:12:29.444815	2022-03-31 04:12:29.444815	\N	885	645	2019-01-01 00:00:00	Old Data Migration.
+2793	2022-03-31 04:12:29.812559	2022-03-31 04:12:29.812559	\N	885	47	2021-09-01 00:00:00	Old Data Migration.
+2794	2022-03-31 04:12:30.143447	2022-03-31 04:12:30.143447	\N	886	50	2013-01-01 00:00:00	Old Data Migration.
+2795	2022-03-31 04:12:30.361073	2022-03-31 04:12:30.361073	\N	886	17	2015-01-01 00:00:00	Old Data Migration.
+2796	2022-03-31 04:12:30.57441	2022-03-31 04:12:30.57441	\N	887	300	2012-01-01 00:00:00	Old Data Migration.
+2797	2022-03-31 04:12:30.895647	2022-03-31 04:12:30.895647	\N	887	300	2013-01-01 00:00:00	Old Data Migration.
+2798	2022-03-31 04:12:31.184638	2022-03-31 04:12:31.184638	\N	887	225	2014-01-01 00:00:00	Old Data Migration.
+2799	2022-03-31 04:12:31.434169	2022-03-31 04:12:31.434169	\N	888	482	2015-01-01 00:00:00	Old Data Migration.
+2800	2022-03-31 04:12:31.811911	2022-03-31 04:12:31.811911	\N	889	600	2012-01-01 00:00:00	Old Data Migration.
+2801	2022-03-31 04:12:32.114549	2022-03-31 04:12:32.114549	\N	891	1605	2020-01-01 00:00:00	Old Data Migration.
+2802	2022-03-31 04:12:32.461645	2022-03-31 04:12:32.461645	\N	892	533	2018-01-01 00:00:00	Old Data Migration.
+2803	2022-03-31 04:12:32.832472	2022-03-31 04:12:32.832472	\N	892	500	2019-01-01 00:00:00	Old Data Migration.
+2804	2022-03-31 04:12:33.028285	2022-03-31 04:12:33.028285	\N	893	600	2015-01-01 00:00:00	Old Data Migration.
+2805	2022-03-31 04:12:33.334434	2022-03-31 04:12:33.334434	\N	893	300	2016-01-01 00:00:00	Old Data Migration.
+2806	2022-03-31 04:12:33.546729	2022-03-31 04:12:33.546729	\N	893	1899	2020-01-01 00:00:00	Old Data Migration.
+2807	2022-03-31 04:12:33.955516	2022-03-31 04:12:33.955516	\N	894	320	2018-01-01 00:00:00	Old Data Migration.
+2808	2022-03-31 04:12:34.310245	2022-03-31 04:12:34.310245	\N	894	273	2019-01-01 00:00:00	Old Data Migration.
+2809	2022-03-31 04:12:34.56206	2022-03-31 04:12:34.56206	\N	895	614	2021-09-01 00:00:00	Old Data Migration.
+2810	2022-03-31 04:12:34.93186	2022-03-31 04:12:34.93186	\N	897	200	2014-01-01 00:00:00	Old Data Migration.
+2811	2022-03-31 04:12:35.146814	2022-03-31 04:12:35.146814	\N	898	1265	2021-01-01 00:00:00	Old Data Migration.
+2812	2022-03-31 04:12:35.638214	2022-03-31 04:12:35.638214	\N	899	235	2021-01-01 00:00:00	Old Data Migration.
+2813	2022-03-31 04:12:36.007265	2022-03-31 04:12:36.007265	\N	899	124	2021-09-01 00:00:00	Old Data Migration.
+2814	2022-03-31 04:12:36.456638	2022-03-31 04:12:36.456638	\N	900	257	2018-01-01 00:00:00	Old Data Migration.
+2815	2022-03-31 04:12:37.573867	2022-03-31 04:12:37.573867	\N	900	463	2019-01-01 00:00:00	Old Data Migration.
+2816	2022-03-31 04:12:37.772889	2022-03-31 04:12:37.772889	\N	901	50	2014-01-01 00:00:00	Old Data Migration.
+2817	2022-03-31 04:12:37.981439	2022-03-31 04:12:37.981439	\N	902	1623	2021-01-01 00:00:00	Old Data Migration.
+2818	2022-03-31 04:12:38.324193	2022-03-31 04:12:38.324193	\N	903	772	2021-09-01 00:00:00	Old Data Migration.
+2819	2022-03-31 04:12:38.562107	2022-03-31 04:12:38.562107	\N	904	200	2014-01-01 00:00:00	Old Data Migration.
+2820	2022-03-31 04:12:38.958542	2022-03-31 04:12:38.958542	\N	905	1500	2013-01-01 00:00:00	Old Data Migration.
+2821	2022-03-31 04:12:39.154025	2022-03-31 04:12:39.154025	\N	905	1000	2014-01-01 00:00:00	Old Data Migration.
+2822	2022-03-31 04:12:39.359314	2022-03-31 04:12:39.359314	\N	905	525	2016-01-01 00:00:00	Old Data Migration.
+2823	2022-03-31 04:12:39.567826	2022-03-31 04:12:39.567826	\N	906	800	2014-01-01 00:00:00	Old Data Migration.
+2824	2022-03-31 04:12:39.772492	2022-03-31 04:12:39.772492	\N	906	500	2015-01-01 00:00:00	Old Data Migration.
+2825	2022-03-31 04:12:39.993204	2022-03-31 04:12:39.993204	\N	906	477	2018-01-01 00:00:00	Old Data Migration.
+2826	2022-03-31 04:12:40.196476	2022-03-31 04:12:40.196476	\N	907	700	2014-01-01 00:00:00	Old Data Migration.
+2827	2022-03-31 04:12:40.407523	2022-03-31 04:12:40.407523	\N	907	600	2015-01-01 00:00:00	Old Data Migration.
+2828	2022-03-31 04:12:40.599916	2022-03-31 04:12:40.599916	\N	907	225	2016-01-01 00:00:00	Old Data Migration.
+2829	2022-03-31 04:12:40.849647	2022-03-31 04:12:40.849647	\N	907	1769	2020-01-01 00:00:00	Old Data Migration.
+2830	2022-03-31 04:12:41.069217	2022-03-31 04:12:41.069217	\N	908	903	2021-09-01 00:00:00	Old Data Migration.
+2831	2022-03-31 04:12:41.334496	2022-03-31 04:12:41.334496	\N	909	1842	2020-01-01 00:00:00	Old Data Migration.
+2832	2022-03-31 04:12:41.642688	2022-03-31 04:12:41.642688	\N	910	1200	2014-01-01 00:00:00	Old Data Migration.
+2833	2022-03-31 04:12:41.870764	2022-03-31 04:12:41.870764	\N	911	50	2014-01-01 00:00:00	Old Data Migration.
+2834	2022-03-31 04:12:42.098689	2022-03-31 04:12:42.098689	\N	912	1300	2013-01-01 00:00:00	Old Data Migration.
+2835	2022-03-31 04:12:42.315652	2022-03-31 04:12:42.315652	\N	912	407	2017-01-01 00:00:00	Old Data Migration.
+2836	2022-03-31 04:12:42.546137	2022-03-31 04:12:42.546137	\N	912	1444	2020-01-01 00:00:00	Old Data Migration.
+2837	2022-03-31 04:12:42.790691	2022-03-31 04:12:42.790691	\N	914	630	2017-01-01 00:00:00	Old Data Migration.
+2838	2022-03-31 04:12:42.998075	2022-03-31 04:12:42.998075	\N	914	238	2019-01-01 00:00:00	Old Data Migration.
+2839	2022-03-31 04:12:43.206647	2022-03-31 04:12:43.206647	\N	915	484	2019-01-01 00:00:00	Old Data Migration.
+2840	2022-03-31 04:12:43.410499	2022-03-31 04:12:43.410499	\N	915	2816	2021-01-01 00:00:00	Old Data Migration.
+2841	2022-03-31 04:12:43.613827	2022-03-31 04:12:43.613827	\N	916	150	2016-01-01 00:00:00	Old Data Migration.
+2842	2022-03-31 04:12:43.834568	2022-03-31 04:12:43.834568	\N	916	691	2017-01-01 00:00:00	Old Data Migration.
+2843	2022-03-31 04:12:44.037961	2022-03-31 04:12:44.037961	\N	916	412	2018-01-01 00:00:00	Old Data Migration.
+2844	2022-03-31 04:12:44.410961	2022-03-31 04:12:44.410961	\N	916	290	2019-01-01 00:00:00	Old Data Migration.
+2845	2022-03-31 04:12:44.769921	2022-03-31 04:12:44.769921	\N	916	1311	2021-01-01 00:00:00	Old Data Migration.
+2846	2022-03-31 04:12:45.169065	2022-03-31 04:12:45.169065	\N	916	594	2021-09-01 00:00:00	Old Data Migration.
+2847	2022-03-31 04:12:45.747576	2022-03-31 04:12:45.747576	\N	917	700	2014-01-01 00:00:00	Old Data Migration.
+2848	2022-03-31 04:12:46.023258	2022-03-31 04:12:46.023258	\N	917	1000	2015-01-01 00:00:00	Old Data Migration.
+2849	2022-03-31 04:12:46.286487	2022-03-31 04:12:46.286487	\N	917	150	2016-01-01 00:00:00	Old Data Migration.
+2850	2022-03-31 04:12:46.552457	2022-03-31 04:12:46.552457	\N	917	580	2021-09-01 00:00:00	Old Data Migration.
+2851	2022-03-31 04:12:46.796247	2022-03-31 04:12:46.796247	\N	918	835	2021-09-01 00:00:00	Old Data Migration.
+2852	2022-03-31 04:12:47.114202	2022-03-31 04:12:47.114202	\N	919	600	2014-01-01 00:00:00	Old Data Migration.
+2853	2022-03-31 04:12:47.356907	2022-03-31 04:12:47.356907	\N	933	1557	2021-01-01 00:00:00	Old Data Migration.
+2854	2022-03-31 04:12:47.65016	2022-03-31 04:12:47.65016	\N	935	843	2021-09-01 00:00:00	Old Data Migration.
+2855	2022-03-31 04:12:48.039871	2022-03-31 04:12:48.039871	\N	922	50	2014-01-01 00:00:00	Old Data Migration.
+2856	2022-03-31 04:12:48.328402	2022-03-31 04:12:48.328402	\N	923	180	2021-01-01 00:00:00	Old Data Migration.
+2857	2022-03-31 04:12:48.656137	2022-03-31 04:12:48.656137	\N	924	1000	2013-01-01 00:00:00	Old Data Migration.
+2858	2022-03-31 04:12:48.8618	2022-03-31 04:12:48.8618	\N	924	600	2014-01-01 00:00:00	Old Data Migration.
+2859	2022-03-31 04:12:49.064253	2022-03-31 04:12:49.064253	\N	924	363	2019-01-01 00:00:00	Old Data Migration.
+2860	2022-03-31 04:12:49.270447	2022-03-31 04:12:49.270447	\N	925	532	2017-01-01 00:00:00	Old Data Migration.
+2861	2022-03-31 04:12:49.463798	2022-03-31 04:12:49.463798	\N	926	1000	2013-01-01 00:00:00	Old Data Migration.
+2862	2022-03-31 04:12:49.670769	2022-03-31 04:12:49.670769	\N	927	50	2014-01-01 00:00:00	Old Data Migration.
+2863	2022-03-31 04:12:50.062094	2022-03-31 04:12:50.062094	\N	928	400	2014-01-01 00:00:00	Old Data Migration.
+2864	2022-03-31 04:12:50.267221	2022-03-31 04:12:50.267221	\N	929	182	2018-01-01 00:00:00	Old Data Migration.
+2865	2022-03-31 04:12:50.469671	2022-03-31 04:12:50.469671	\N	931	300	2013-01-01 00:00:00	Old Data Migration.
+2866	2022-03-31 04:12:50.705124	2022-03-31 04:12:50.705124	\N	932	300	2016-01-01 00:00:00	Old Data Migration.
+2867	2022-03-31 04:12:50.934647	2022-03-31 04:12:50.934647	\N	932	372	2017-01-01 00:00:00	Old Data Migration.
+2868	2022-03-31 04:12:51.150497	2022-03-31 04:12:51.150497	\N	934	892	2021-09-01 00:00:00	Old Data Migration.
+2869	2022-03-31 04:12:51.350973	2022-03-31 04:12:51.350973	\N	936	110	2017-01-01 00:00:00	Old Data Migration.
+2870	2022-03-31 04:12:51.555575	2022-03-31 04:12:51.555575	\N	937	500	2014-01-01 00:00:00	Old Data Migration.
+2871	2022-03-31 04:12:51.790455	2022-03-31 04:12:51.790455	\N	938	200	2013-01-01 00:00:00	Old Data Migration.
+2872	2022-03-31 04:12:52.009399	2022-03-31 04:12:52.009399	\N	938	458	2021-09-01 00:00:00	Old Data Migration.
+2873	2022-03-31 04:12:52.204467	2022-03-31 04:12:52.204467	\N	939	800	2014-01-01 00:00:00	Old Data Migration.
+2874	2022-03-31 04:12:52.402084	2022-03-31 04:12:52.402084	\N	939	400	2015-01-01 00:00:00	Old Data Migration.
+2875	2022-03-31 04:12:52.606112	2022-03-31 04:12:52.606112	\N	940	856	2021-09-01 00:00:00	Old Data Migration.
+2876	2022-03-31 04:12:52.808513	2022-03-31 04:12:52.808513	\N	941	794	2020-01-01 00:00:00	Old Data Migration.
+2877	2022-03-31 04:12:53.04394	2022-03-31 04:12:53.04394	\N	941	705	2021-01-01 00:00:00	Old Data Migration.
+2878	2022-03-31 04:12:53.507494	2022-03-31 04:12:53.507494	\N	941	571	2021-09-01 00:00:00	Old Data Migration.
+2879	2022-03-31 04:12:53.718786	2022-03-31 04:12:53.718786	\N	942	1132	2017-01-01 00:00:00	Old Data Migration.
+2880	2022-03-31 04:12:53.938646	2022-03-31 04:12:53.938646	\N	943	494	2018-01-01 00:00:00	Old Data Migration.
+2881	2022-03-31 04:12:54.132083	2022-03-31 04:12:54.132083	\N	943	48	2019-01-01 00:00:00	Old Data Migration.
+2882	2022-03-31 04:12:54.338694	2022-03-31 04:12:54.338694	\N	943	1090	2020-01-01 00:00:00	Old Data Migration.
+2883	2022-03-31 04:12:54.564775	2022-03-31 04:12:54.564775	\N	944	810	2021-09-01 00:00:00	Old Data Migration.
+2884	2022-03-31 04:12:54.77218	2022-03-31 04:12:54.77218	\N	946	853	2021-09-01 00:00:00	Old Data Migration.
+2885	2022-03-31 04:12:54.984797	2022-03-31 04:12:54.984797	\N	947	623	2019-01-01 00:00:00	Old Data Migration.
+2886	2022-03-31 04:12:55.178824	2022-03-31 04:12:55.178824	\N	948	289	2019-01-01 00:00:00	Old Data Migration.
+2887	2022-03-31 04:12:55.379959	2022-03-31 04:12:55.379959	\N	949	1517	2021-01-01 00:00:00	Old Data Migration.
+2888	2022-03-31 04:12:55.904497	2022-03-31 04:12:55.904497	\N	949	196	2021-09-01 00:00:00	Old Data Migration.
+2889	2022-03-31 04:12:56.113237	2022-03-31 04:12:56.113237	\N	950	748	2018-01-01 00:00:00	Old Data Migration.
+2890	2022-03-31 04:12:56.309188	2022-03-31 04:12:56.309188	\N	951	300	2014-01-01 00:00:00	Old Data Migration.
+2891	2022-03-31 04:12:56.505343	2022-03-31 04:12:56.505343	\N	951	150	2016-01-01 00:00:00	Old Data Migration.
+2892	2022-03-31 04:12:56.709672	2022-03-31 04:12:56.709672	\N	952	600	2014-01-01 00:00:00	Old Data Migration.
+2893	2022-03-31 04:12:56.932469	2022-03-31 04:12:56.932469	\N	952	1000	2020-01-01 00:00:00	Old Data Migration.
+2894	2022-03-31 04:12:57.132438	2022-03-31 04:12:57.132438	\N	952	487	2021-01-01 00:00:00	Old Data Migration.
+2895	2022-03-31 04:12:57.33333	2022-03-31 04:12:57.33333	\N	953	200	2015-01-01 00:00:00	Old Data Migration.
+2896	2022-03-31 04:12:57.535204	2022-03-31 04:12:57.535204	\N	954	700	2014-01-01 00:00:00	Old Data Migration.
+2897	2022-03-31 04:12:57.728804	2022-03-31 04:12:57.728804	\N	954	150	2016-01-01 00:00:00	Old Data Migration.
+2898	2022-03-31 04:12:57.928462	2022-03-31 04:12:57.928462	\N	954	114	2017-01-01 00:00:00	Old Data Migration.
+2899	2022-03-31 04:12:58.132357	2022-03-31 04:12:58.132357	\N	954	297	2018-01-01 00:00:00	Old Data Migration.
+2900	2022-03-31 04:12:58.322892	2022-03-31 04:12:58.322892	\N	954	280	2019-01-01 00:00:00	Old Data Migration.
+2901	2022-03-31 04:12:58.516374	2022-03-31 04:12:58.516374	\N	954	860	2021-01-01 00:00:00	Old Data Migration.
+2902	2022-03-31 04:12:58.726412	2022-03-31 04:12:58.726412	\N	956	75	2016-01-01 00:00:00	Old Data Migration.
+2903	2022-03-31 04:12:58.928775	2022-03-31 04:12:58.928775	\N	957	285	2021-09-01 00:00:00	Old Data Migration.
+2904	2022-03-31 04:12:59.136814	2022-03-31 04:12:59.136814	\N	958	298	2018-01-01 00:00:00	Old Data Migration.
+2905	2022-03-31 04:12:59.337183	2022-03-31 04:12:59.337183	\N	959	1627	2021-01-01 00:00:00	Old Data Migration.
+2906	2022-03-31 04:12:59.532281	2022-03-31 04:12:59.532281	\N	960	400	2017-01-01 00:00:00	Old Data Migration.
+2907	2022-03-31 04:13:01.004527	2022-03-31 04:13:01.004527	\N	960	334	2019-01-01 00:00:00	Old Data Migration.
+2908	2022-03-31 04:13:01.332545	2022-03-31 04:13:01.332545	\N	961	330	2021-01-01 00:00:00	Old Data Migration.
+2909	2022-03-31 04:13:01.706823	2022-03-31 04:13:01.706823	\N	961	385	2021-09-01 00:00:00	Old Data Migration.
+2910	2022-03-31 04:13:02.140268	2022-03-31 04:13:02.140268	\N	962	800	2014-01-01 00:00:00	Old Data Migration.
+2911	2022-03-31 04:13:02.558918	2022-03-31 04:13:02.558918	\N	962	471	2018-01-01 00:00:00	Old Data Migration.
+2912	2022-03-31 04:13:02.878256	2022-03-31 04:13:02.878256	\N	962	455	2019-01-01 00:00:00	Old Data Migration.
+2913	2022-03-31 04:13:03.142211	2022-03-31 04:13:03.142211	\N	963	680	2018-01-01 00:00:00	Old Data Migration.
+2914	2022-03-31 04:13:03.34905	2022-03-31 04:13:03.34905	\N	963	720	2021-01-01 00:00:00	Old Data Migration.
+2915	2022-03-31 04:13:03.546313	2022-03-31 04:13:03.546313	\N	964	1000	2013-01-01 00:00:00	Old Data Migration.
+2916	2022-03-31 04:13:03.747739	2022-03-31 04:13:03.747739	\N	964	660	2019-01-01 00:00:00	Old Data Migration.
+2917	2022-03-31 04:13:03.940476	2022-03-31 04:13:03.940476	\N	965	583	2019-01-01 00:00:00	Old Data Migration.
+2918	2022-03-31 04:13:04.145445	2022-03-31 04:13:04.145445	\N	965	1405	2020-01-01 00:00:00	Old Data Migration.
+2919	2022-03-31 04:13:04.360908	2022-03-31 04:13:04.360908	\N	966	800	2015-01-01 00:00:00	Old Data Migration.
+2920	2022-03-31 04:13:04.55438	2022-03-31 04:13:04.55438	\N	967	1702	2020-01-01 00:00:00	Old Data Migration.
+2921	2022-03-31 04:13:04.768444	2022-03-31 04:13:04.768444	\N	967	261	2021-01-01 00:00:00	Old Data Migration.
+2922	2022-03-31 04:13:04.991629	2022-03-31 04:13:04.991629	\N	967	298	2021-09-01 00:00:00	Old Data Migration.
+2923	2022-03-31 04:13:05.18928	2022-03-31 04:13:05.18928	\N	968	99	2017-01-01 00:00:00	Old Data Migration.
+2924	2022-03-31 04:13:05.40037	2022-03-31 04:13:05.40037	\N	968	480	2018-01-01 00:00:00	Old Data Migration.
+2925	2022-03-31 04:13:05.596411	2022-03-31 04:13:05.596411	\N	968	891	2020-01-01 00:00:00	Old Data Migration.
+2926	2022-03-31 04:13:05.784727	2022-03-31 04:13:05.784727	\N	969	1281	2021-01-01 00:00:00	Old Data Migration.
+2927	2022-03-31 04:13:05.985772	2022-03-31 04:13:05.985772	\N	970	1858	2020-01-01 00:00:00	Old Data Migration.
+2928	2022-03-31 04:13:06.189058	2022-03-31 04:13:06.189058	\N	971	225	2016-01-01 00:00:00	Old Data Migration.
+2929	2022-03-31 04:13:06.386054	2022-03-31 04:13:06.386054	\N	971	1132	2017-01-01 00:00:00	Old Data Migration.
+2930	2022-03-31 04:13:06.587151	2022-03-31 04:13:06.587151	\N	971	1852	2020-01-01 00:00:00	Old Data Migration.
+2931	2022-03-31 04:13:06.772975	2022-03-31 04:13:06.772975	\N	974	1583	2020-01-01 00:00:00	Old Data Migration.
+2932	2022-03-31 04:13:06.962724	2022-03-31 04:13:06.962724	\N	975	732	2019-01-01 00:00:00	Old Data Migration.
+2933	2022-03-31 04:13:07.159017	2022-03-31 04:13:07.159017	\N	975	1476	2020-01-01 00:00:00	Old Data Migration.
+2934	2022-03-31 04:13:07.36182	2022-03-31 04:13:07.36182	\N	975	235	2021-01-01 00:00:00	Old Data Migration.
+2935	2022-03-31 04:13:07.571668	2022-03-31 04:13:07.571668	\N	976	800	2014-01-01 00:00:00	Old Data Migration.
+2936	2022-03-31 04:13:07.770693	2022-03-31 04:13:07.770693	\N	976	588	2017-01-01 00:00:00	Old Data Migration.
+2937	2022-03-31 04:13:07.968591	2022-03-31 04:13:07.968591	\N	976	414	2019-01-01 00:00:00	Old Data Migration.
+2938	2022-03-31 04:13:08.248369	2022-03-31 04:13:08.248369	\N	977	300	2013-01-01 00:00:00	Old Data Migration.
+2939	2022-03-31 04:13:08.572262	2022-03-31 04:13:08.572262	\N	977	200	2014-01-01 00:00:00	Old Data Migration.
+2940	2022-03-31 04:13:08.878057	2022-03-31 04:13:08.878057	\N	977	375	2016-01-01 00:00:00	Old Data Migration.
+2941	2022-03-31 04:13:09.220987	2022-03-31 04:13:09.220987	\N	978	279	2021-09-01 00:00:00	Old Data Migration.
+2942	2022-03-31 04:13:09.471434	2022-03-31 04:13:09.471434	\N	979	500	2015-01-01 00:00:00	Old Data Migration.
+2943	2022-03-31 04:13:09.805805	2022-03-31 04:13:09.805805	\N	980	1000	2011-01-01 00:00:00	Old Data Migration.
+2944	2022-03-31 04:13:10.00577	2022-03-31 04:13:10.00577	\N	980	800	2012-01-01 00:00:00	Old Data Migration.
+2945	2022-03-31 04:13:10.194591	2022-03-31 04:13:10.194591	\N	980	700	2013-01-01 00:00:00	Old Data Migration.
+2946	2022-03-31 04:13:10.382414	2022-03-31 04:13:10.382414	\N	980	200	2014-01-01 00:00:00	Old Data Migration.
+2947	2022-03-31 04:13:10.576571	2022-03-31 04:13:10.576571	\N	980	150	2016-01-01 00:00:00	Old Data Migration.
+2948	2022-03-31 04:13:10.770181	2022-03-31 04:13:10.770181	\N	980	175	2017-01-01 00:00:00	Old Data Migration.
+2949	2022-03-31 04:13:10.977922	2022-03-31 04:13:10.977922	\N	980	287	2018-01-01 00:00:00	Old Data Migration.
+2950	2022-03-31 04:13:11.167515	2022-03-31 04:13:11.167515	\N	980	531	2019-01-01 00:00:00	Old Data Migration.
+2951	2022-03-31 04:13:11.36453	2022-03-31 04:13:11.36453	\N	980	860	2021-01-01 00:00:00	Old Data Migration.
+2952	2022-03-31 04:13:11.561921	2022-03-31 04:13:11.561921	\N	980	332	2021-09-01 00:00:00	Old Data Migration.
+2953	2022-03-31 04:13:11.770405	2022-03-31 04:13:11.770405	\N	981	665	2019-01-01 00:00:00	Old Data Migration.
+2954	2022-03-31 04:13:12.286702	2022-03-31 04:13:12.286702	\N	982	25	2015-01-01 00:00:00	Old Data Migration.
+2955	2022-03-31 04:13:12.49034	2022-03-31 04:13:12.49034	\N	983	833	2021-09-01 00:00:00	Old Data Migration.
+2956	2022-03-31 04:13:12.713402	2022-03-31 04:13:12.713402	\N	984	476	2018-01-01 00:00:00	Old Data Migration.
+2957	2022-03-31 04:13:12.968563	2022-03-31 04:13:12.968563	\N	984	503	2019-01-01 00:00:00	Old Data Migration.
+2958	2022-03-31 04:13:13.166458	2022-03-31 04:13:13.166458	\N	985	225	2016-01-01 00:00:00	Old Data Migration.
+2959	2022-03-31 04:13:13.368622	2022-03-31 04:13:13.368622	\N	985	275	2017-01-01 00:00:00	Old Data Migration.
+2960	2022-03-31 04:13:13.57823	2022-03-31 04:13:13.57823	\N	986	500	2012-01-01 00:00:00	Old Data Migration.
+2961	2022-03-31 04:13:13.776419	2022-03-31 04:13:13.776419	\N	986	1100	2013-01-01 00:00:00	Old Data Migration.
+2962	2022-03-31 04:13:13.976959	2022-03-31 04:13:13.976959	\N	986	502	2021-09-01 00:00:00	Old Data Migration.
+2963	2022-03-31 04:13:14.189162	2022-03-31 04:13:14.189162	\N	987	1164	2021-01-01 00:00:00	Old Data Migration.
+2964	2022-03-31 04:13:14.379898	2022-03-31 04:13:14.379898	\N	987	182	2021-09-01 00:00:00	Old Data Migration.
+2965	2022-03-31 04:13:14.56965	2022-03-31 04:13:14.56965	\N	988	400	2014-01-01 00:00:00	Old Data Migration.
+2966	2022-03-31 04:13:15.146844	2022-03-31 04:13:15.146844	\N	988	300	2016-01-01 00:00:00	Old Data Migration.
+\.
+
+
+--
+-- Data for Name: flyway_schema_history; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.flyway_schema_history (installed_rank, version, description, type, script, checksum, installed_by, installed_on, execution_time, success) FROM stdin;
+1	1	Initial Import	SQL	V1__Initial_Import.sql	1788485592	postgres	2020-11-30 22:56:18.498887	782	t
+2	1.1	Integer IDs	SQL	V1_1__Integer_IDs.sql	-1361964689	postgres	2020-12-11 13:33:58.323762	583	t
+3	1.2	Longer School Names	SQL	V1_2__Longer_School_Names.sql	-293223788	postgres	2021-02-18 18:33:11.473907	94	t
+4	1.3	Update School Reports	SQL	V1_3__Update_School_Reports.sql	604818463	postgres	2021-02-18 18:33:11.772917	408	t
+5	1.4	Remove IP Libraries	SQL	V1_4__Remove_IP_Libraries.sql	-2068366513	postgres	2021-02-20 17:10:07.220258	279	t
+6	1.5	Add Book Tracking	SQL	V1_5__Add_Book_Tracking.sql	-266419183	postgres	2021-02-20 17:10:08.05225	326	t
+7	1.6	Update Reports Visit Reason	SQL	V1_6__Update_Reports_Visit_Reason.sql	-36248655	postgres	2021-03-15 14:15:30.77487	170	t
+8	1.7	Add Action Plan Success Stories	SQL	V1_7__Add_Action_Plan_Success_Stories.sql	555658910	postgres	2021-05-11 17:17:34.545254	158	t
+9	1.8	Add Grades Attended	SQL	V1_8__Add_Grades_Attended.sql	1123568676	postgres	2021-06-22 23:54:27.364318	101	t
+10	1.9	Change Status To Array	SQL	V1_9__Change_Status_To_Array.sql	-2064374366	postgres	2021-07-05 17:17:23.456778	125	t
+11	2.1	User Disabled Field	SQL	V2_1__User_Disabled_Field.sql	1989189568	postgres	2021-07-14 21:59:06.87105	83	t
+12	2.2	Report Timetables	SQL	V2_2__Report_Timetables.sql	1843860310	postgres	2021-07-18 22:24:20.725114	245	t
+13	2.3	Fix Users	SQL	V2_3__Fix_Users.sql	881350032	postgres	2021-07-18 22:24:21.526831	280	t
+14	2.4	Update Privilege Level	SQL	V2_4__Update_Privilege_Level.sql	1539477	postgres	2021-08-10 13:50:59.281942	95	t
+15	2.5	Shipment Yea Nullable	SQL	V2_5__Shipment_Yea_Nullable.sql	-1293830041	postgres	2022-01-07 02:28:26.095754	93	t
+16	2.6	Checkout timetable	SQL	V2_6__Checkout_timetable.sql	1699834863	postgres	2022-01-07 02:28:26.368908	96	t
+17	2.7	Add Trainers Library Prevention	SQL	V2_7__Add_Trainers_Library_Prevention.sql	1478955430	postgres	2022-01-07 02:28:26.634411	74	t
+18	2.8	Add Reason No Library Space	SQL	V2_8__Add_Reason_No_Library_Space.sql	-206375345	postgres	2022-01-07 02:28:26.873956	74	t
+19	2.9	Add Total Students To School	SQL	V2_9__Add_Total_Students_To_School.sql	-467009246	postgres	2022-03-30 03:01:53.559504	90	t
+\.
+
+
+--
+-- Data for Name: school_contacts; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.school_contacts (id, created_at, updated_at, deleted_at, school_id, email, address, phone, is_primary, first_name, last_name, type) FROM stdin;
+\.
+
+
+--
+-- Data for Name: school_reports_with_libraries; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.school_reports_with_libraries (id, created_at, updated_at, deleted_at, user_id, school_id, number_of_children, number_of_books, most_recent_shipment_year, is_shared_space, has_inviting_space, assigned_person_role, assigned_person_title, apprenticeship_program, trains_and_mentors_apprentices, has_check_in_timetables, has_book_checkout_system, number_of_student_librarians, reason_no_student_librarians, has_sufficient_training, teacher_support, parent_support, visit_reason, action_plan, success_stories, grades_attended, checkin_timetable, checkout_timetable, number_of_student_librarians_trainers) FROM stdin;
+7	2022-04-08 15:10:30.927506	2022-04-08 15:10:30.927506	\N	12	583	468	2343	2021	t	f	FULL_TIME	OTHER	OTHER	f	t	t	6	\N	t	more checkout inserts in books (this is just a test)		this is a test	\N	this is a test	{FORM_ONE,FORM_TWO,FORM_THREE,FORM_FOUR,FORM_FIVE}	null	null	\N
+\.
+
+
+--
+-- Data for Name: school_reports_without_libraries; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.school_reports_without_libraries (id, created_at, updated_at, deleted_at, user_id, school_id, number_of_children, number_of_books, most_recent_shipment_year, reason_why_not, wants_library, has_space, ready_timeline, visit_reason, action_plan, success_stories, grades_attended, current_status, reason_no_library_space) FROM stdin;
+\.
+
+
+--
+-- Data for Name: schools; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.schools (id, created_at, updated_at, deleted_at, name, address, hidden, country, area, phone, email, notes, library_status, total_students) FROM stdin;
+519	2022-03-31 04:07:23.410948	2022-03-31 04:07:23.410948	\N	All Saints Secondary School		f	ANTIGUA_AND_BARBUDA	\N	\N	\N	\N	UNKNOWN	740
+520	2022-03-31 04:07:23.456675	2022-03-31 04:07:23.456675	\N	Antigua Girls High School		f	ANTIGUA_AND_BARBUDA	\N	\N	\N	\N	UNKNOWN	570
+521	2022-03-31 04:07:23.496748	2022-03-31 04:07:23.496748	\N	Antigua Wesleyan Junior Academy		f	ANTIGUA_AND_BARBUDA	\N	\N	\N	\N	UNKNOWN	180
+522	2022-03-31 04:07:23.536364	2022-03-31 04:07:23.536364	\N	Bendals Primary School		f	ANTIGUA_AND_BARBUDA	\N	\N	\N	\N	UNKNOWN	120
+523	2022-03-31 04:07:23.574824	2022-03-31 04:07:23.574824	\N	Boys Training School (ages 13-17)		f	ANTIGUA_AND_BARBUDA	\N	\N	\N	\N	UNKNOWN	13
+524	2022-03-31 04:07:23.612812	2022-03-31 04:07:23.612812	\N	Buckleys Primary School		f	ANTIGUA_AND_BARBUDA	\N	\N	\N	\N	UNKNOWN	113
+525	2022-03-31 04:07:23.660483	2022-03-31 04:07:23.660483	\N	Cedar Grove Primary School		f	ANTIGUA_AND_BARBUDA	\N	\N	\N	\N	UNKNOWN	145
+526	2022-03-31 04:07:23.699298	2022-03-31 04:07:23.699298	\N	Clare Hall Secondary School		f	ANTIGUA_AND_BARBUDA	\N	\N	\N	\N	UNKNOWN	765
+527	2022-03-31 04:07:23.738792	2022-03-31 04:07:23.738792	\N	Charlesworth T. Samuel John Hughes Primary		f	ANTIGUA_AND_BARBUDA	\N	\N	\N	\N	UNKNOWN	48
+528	2022-03-31 04:07:23.778812	2022-03-31 04:07:23.778812	\N	Environmental Awareness Group		f	ANTIGUA_AND_BARBUDA	\N	\N	\N	\N	UNKNOWN	250
+529	2022-03-31 04:07:23.832427	2022-03-31 04:07:23.832427	\N	Five Islands Primary School		f	ANTIGUA_AND_BARBUDA	\N	\N	\N	\N	UNKNOWN	419
+530	2022-03-31 04:07:23.916493	2022-03-31 04:07:23.916493	\N	Freeman's Ville Primary School		f	ANTIGUA_AND_BARBUDA	\N	\N	\N	\N	UNKNOWN	93
+531	2022-03-31 04:07:23.988813	2022-03-31 04:07:23.988813	\N	Freetown Primary School		f	ANTIGUA_AND_BARBUDA	\N	\N	\N	\N	UNKNOWN	43
+532	2022-03-31 04:07:24.06843	2022-03-31 04:07:24.06843	\N	Glanvilles Secondary School		f	ANTIGUA_AND_BARBUDA	\N	\N	\N	\N	UNKNOWN	111
+533	2022-03-31 04:07:24.127469	2022-03-31 04:07:24.127469	\N	Golden Grove Primary School		f	ANTIGUA_AND_BARBUDA	\N	\N	\N	\N	UNKNOWN	344
+534	2022-03-31 04:07:24.188572	2022-03-31 04:07:24.188572	\N	Green Bay Primary School		f	ANTIGUA_AND_BARBUDA	\N	\N	\N	\N	UNKNOWN	320
+535	2022-03-31 04:07:24.538409	2022-03-31 04:07:24.538409	\N	Holy Trinity Primary School (Barbuda)		f	ANTIGUA_AND_BARBUDA	\N	\N	\N	\N	UNKNOWN	220
+536	2022-03-31 04:07:24.588504	2022-03-31 04:07:24.588504	\N	Irene B. Williams Secondary School		f	ANTIGUA_AND_BARBUDA	\N	\N	\N	\N	UNKNOWN	240
+537	2022-03-31 04:07:24.638671	2022-03-31 04:07:24.638671	\N	Jennings Primary School		f	ANTIGUA_AND_BARBUDA	\N	\N	\N	\N	UNKNOWN	200
+538	2022-03-31 04:07:24.684537	2022-03-31 04:07:24.684537	\N	Jennings Secondary School		f	ANTIGUA_AND_BARBUDA	\N	\N	\N	\N	UNKNOWN	800
+539	2022-03-31 04:07:24.848938	2022-03-31 04:07:24.848938	\N	J.T. Ambrose Primary School		f	ANTIGUA_AND_BARBUDA	\N	\N	\N	\N	UNKNOWN	268
+540	2022-03-31 04:07:24.930701	2022-03-31 04:07:24.930701	\N	Kids Unlimited		f	ANTIGUA_AND_BARBUDA	\N	\N	\N	\N	UNKNOWN	142
+541	2022-03-31 04:07:24.976621	2022-03-31 04:07:24.976621	\N	Liberta Primary School		f	ANTIGUA_AND_BARBUDA	\N	\N	\N	\N	UNKNOWN	125
+542	2022-03-31 04:07:25.034873	2022-03-31 04:07:25.034873	\N	Mary E. Pigott Primary School		f	ANTIGUA_AND_BARBUDA	\N	\N	\N	\N	UNKNOWN	400
+543	2022-03-31 04:07:25.084616	2022-03-31 04:07:25.084616	\N	New Bethel SDA Primary School		f	ANTIGUA_AND_BARBUDA	\N	\N	\N	\N	UNKNOWN	334
+544	2022-03-31 04:07:25.151649	2022-03-31 04:07:25.151649	\N	New Winthorpes Primary School		f	ANTIGUA_AND_BARBUDA	\N	\N	\N	\N	UNKNOWN	140
+545	2022-03-31 04:07:25.208856	2022-03-31 04:07:25.208856	\N	Newfields Primary School		f	ANTIGUA_AND_BARBUDA	\N	\N	\N	\N	UNKNOWN	53
+546	2022-03-31 04:07:25.256322	2022-03-31 04:07:25.256322	\N	Old Road Primary School		f	ANTIGUA_AND_BARBUDA	\N	\N	\N	\N	UNKNOWN	94
+547	2022-03-31 04:07:25.348492	2022-03-31 04:07:25.348492	\N	Olivia David Primary School		f	ANTIGUA_AND_BARBUDA	\N	\N	\N	\N	UNKNOWN	165
+548	2022-03-31 04:07:25.391213	2022-03-31 04:07:25.391213	\N	Ottos Comprehensive Secondary School		f	ANTIGUA_AND_BARBUDA	\N	\N	\N	\N	UNKNOWN	568
+549	2022-03-31 04:07:25.466876	2022-03-31 04:07:25.466876	\N	Pares Primary School		f	ANTIGUA_AND_BARBUDA	\N	\N	\N	\N	UNKNOWN	120
+550	2022-03-31 04:07:25.506528	2022-03-31 04:07:25.506528	\N	Pares Secondary School		f	ANTIGUA_AND_BARBUDA	\N	\N	\N	\N	UNKNOWN	106
+551	2022-03-31 04:07:25.563298	2022-03-31 04:07:25.563298	\N	Parham Primary School		f	ANTIGUA_AND_BARBUDA	\N	\N	\N	\N	UNKNOWN	93
+552	2022-03-31 04:07:25.606749	2022-03-31 04:07:25.606749	\N	Potters Primary School		f	ANTIGUA_AND_BARBUDA	\N	\N	\N	\N	UNKNOWN	214
+553	2022-03-31 04:07:25.644939	2022-03-31 04:07:25.644939	\N	Princess Margaret Secondary School		f	ANTIGUA_AND_BARBUDA	\N	\N	\N	\N	UNKNOWN	987
+554	2022-03-31 04:07:25.684804	2022-03-31 04:07:25.684804	\N	Project Hope		f	ANTIGUA_AND_BARBUDA	\N	\N	\N	\N	UNKNOWN	35
+555	2022-03-31 04:07:25.740568	2022-03-31 04:07:25.740568	\N	St. Andrew's School		f	ANTIGUA_AND_BARBUDA	\N	\N	\N	\N	UNKNOWN	210
+556	2022-03-31 04:07:25.78681	2022-03-31 04:07:25.78681	\N	St. John's Catholic Primary School		f	ANTIGUA_AND_BARBUDA	\N	\N	\N	\N	UNKNOWN	458
+557	2022-03-31 04:07:25.828167	2022-03-31 04:07:25.828167	\N	St. John's Lutheran Primary School		f	ANTIGUA_AND_BARBUDA	\N	\N	\N	\N	UNKNOWN	260
+558	2022-03-31 04:07:25.866017	2022-03-31 04:07:25.866017	\N	St. Mary's Secondary School		f	ANTIGUA_AND_BARBUDA	\N	\N	\N	\N	UNKNOWN	210
+559	2022-03-31 04:07:25.916494	2022-03-31 04:07:25.916494	\N	St. Nicholas' Primary School		f	ANTIGUA_AND_BARBUDA	\N	\N	\N	\N	UNKNOWN	291
+560	2022-03-31 04:07:25.964675	2022-03-31 04:07:25.964675	\N	Sir McChesney George Secondary School		f	ANTIGUA_AND_BARBUDA	\N	\N	\N	\N	UNKNOWN	127
+561	2022-03-31 04:07:26.003893	2022-03-31 04:07:26.003893	\N	Sir Novelle Richards Academy		f	ANTIGUA_AND_BARBUDA	\N	\N	\N	\N	UNKNOWN	148
+562	2022-03-31 04:07:26.05195	2022-03-31 04:07:26.05195	\N	Student Support Centre		f	ANTIGUA_AND_BARBUDA	\N	\N	\N	\N	UNKNOWN	50
+563	2022-03-31 04:07:26.108647	2022-03-31 04:07:26.108647	\N	T.N. Kirnon Primary School		f	ANTIGUA_AND_BARBUDA	\N	\N	\N	\N	UNKNOWN	390
+564	2022-03-31 04:07:26.151837	2022-03-31 04:07:26.151837	\N	Urlings Primary School		f	ANTIGUA_AND_BARBUDA	\N	\N	\N	\N	UNKNOWN	60
+565	2022-03-31 04:07:26.218553	2022-03-31 04:07:26.218553	\N	Victory Center		f	ANTIGUA_AND_BARBUDA	\N	\N	\N	\N	UNKNOWN	15
+566	2022-03-31 04:07:26.257935	2022-03-31 04:07:26.257935	\N	Villa Primary School		f	ANTIGUA_AND_BARBUDA	\N	\N	\N	\N	UNKNOWN	295
+567	2022-03-31 04:07:26.301813	2022-03-31 04:07:26.301813	\N	Willikies Primary School		f	ANTIGUA_AND_BARBUDA	\N	\N	\N	\N	UNKNOWN	71
+568	2022-03-31 04:07:26.366645	2022-03-31 04:07:26.366645	\N	Achievement Learning Centre		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	30
+569	2022-03-31 04:07:26.406553	2022-03-31 04:07:26.406553	\N	Arthur Waldron SDA Academy		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	221
+570	2022-03-31 04:07:26.443516	2022-03-31 04:07:26.443516	\N	Atkinson Primary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	101
+571	2022-03-31 04:07:26.494643	2022-03-31 04:07:26.494643	\N	Bagatelle Primary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	33
+572	2022-03-31 04:07:26.530824	2022-03-31 04:07:26.530824	\N	Baroness Patricia Scotland Primary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	44
+573	2022-03-31 04:07:26.572019	2022-03-31 04:07:26.572019	\N	Beau Bois Pre-School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	42
+574	2022-03-31 04:07:26.614509	2022-03-31 04:07:26.614509	\N	Belles Primary		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	49
+575	2022-03-31 04:07:26.653603	2022-03-31 04:07:26.653603	\N	Bellevue Chopin Primary		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	33
+576	2022-03-31 04:07:26.694047	2022-03-31 04:07:26.694047	\N	Bense Primary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	35
+577	2022-03-31 04:07:26.730704	2022-03-31 04:07:26.730704	\N	Berean Christian Academy		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	87
+578	2022-03-31 04:07:26.769192	2022-03-31 04:07:26.769192	\N	Calibishie Primary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	110
+579	2022-03-31 04:07:26.806673	2022-03-31 04:07:26.806673	\N	CALLS		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	40
+580	2022-03-31 04:07:26.845493	2022-03-31 04:07:26.845493	\N	Campbell Primary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	29
+581	2022-03-31 04:07:26.884487	2022-03-31 04:07:26.884487	\N	Canefield Pre-School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	30
+582	2022-03-31 04:07:26.9228	2022-03-31 04:07:26.9228	\N	Castle Bruce Primary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	150
+584	2022-03-31 04:07:26.999238	2022-03-31 04:07:26.999238	\N	Charlotte's Pre-School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	20
+585	2022-03-31 04:07:27.037031	2022-03-31 04:07:27.037031	\N	Christian Union Primary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	132
+586	2022-03-31 04:07:27.074371	2022-03-31 04:07:27.074371	\N	Clamille Bilingual Montessori		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	65
+587	2022-03-31 04:07:27.1153	2022-03-31 04:07:27.1153	\N	Clifton Primary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	29
+588	2022-03-31 04:07:27.155613	2022-03-31 04:07:27.155613	\N	Colihaut Primary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	34
+589	2022-03-31 04:07:27.194456	2022-03-31 04:07:27.194456	\N	Concord Primary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	66
+590	2022-03-31 04:07:27.233797	2022-03-31 04:07:27.233797	\N	Convent High School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	489
+591	2022-03-31 04:07:27.270405	2022-03-31 04:07:27.270405	\N	Cottage Pre-School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	30
+592	2022-03-31 04:07:27.30674	2022-03-31 04:07:27.30674	\N	Coulibistrie Pre-School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	20
+593	2022-03-31 04:07:27.344564	2022-03-31 04:07:27.344564	\N	Coulibistrie Primary		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	110
+594	2022-03-31 04:07:27.38445	2022-03-31 04:07:27.38445	\N	Delices Primary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	100
+595	2022-03-31 04:07:27.422373	2022-03-31 04:07:27.422373	\N	Dominica Community High School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	101
+596	2022-03-31 04:07:27.460402	2022-03-31 04:07:27.460402	\N	Dominica Grammar School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	800
+597	2022-03-31 04:07:27.498287	2022-03-31 04:07:27.498287	\N	Dos D' Ane Primary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	19
+598	2022-03-31 04:07:27.538508	2022-03-31 04:07:27.538508	\N	Dublanc Primary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	40
+599	2022-03-31 04:07:27.577214	2022-03-31 04:07:27.577214	\N	Dominica Youth Business Trust		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	10
+600	2022-03-31 04:07:27.61846	2022-03-31 04:07:27.61846	\N	Feed My Sheep		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	50
+601	2022-03-31 04:07:27.658251	2022-03-31 04:07:27.658251	\N	Giraudel Primary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	37
+602	2022-03-31 04:07:27.696832	2022-03-31 04:07:27.696832	\N	Goodwill Primary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	490
+603	2022-03-31 04:07:27.732388	2022-03-31 04:07:27.732388	\N	Goodwill Secondary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	368
+604	2022-03-31 04:07:27.77076	2022-03-31 04:07:27.77076	\N	Grand Bay Primary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	200
+605	2022-03-31 04:07:27.816324	2022-03-31 04:07:27.816324	\N	Grand Fond Primary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	41
+606	2022-03-31 04:07:27.858422	2022-03-31 04:07:27.858422	\N	Gregor Nassief Pocket Library Project		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	50
+607	2022-03-31 04:07:27.89992	2022-03-31 04:07:27.89992	\N	Irie Eco Children's Program		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	30
+608	2022-03-31 04:07:27.944019	2022-03-31 04:07:27.944019	\N	Isaiah Thomas Secondary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	602
+609	2022-03-31 04:07:27.982584	2022-03-31 04:07:27.982584	\N	Isulukati Special Education School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	47
+610	2022-03-31 04:07:28.016611	2022-03-31 04:07:28.016611	\N	Jinja Pre-school		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	30
+611	2022-03-31 04:07:28.057434	2022-03-31 04:07:28.057434	\N	Jones Beaupierre Primary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	73
+612	2022-03-31 04:07:28.094674	2022-03-31 04:07:28.094674	\N	Kelleb John Laurent Primary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	106
+613	2022-03-31 04:07:28.134589	2022-03-31 04:07:28.134589	\N	Laudat Primary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	11
+614	2022-03-31 04:07:28.178732	2022-03-31 04:07:28.178732	\N	Love One Teach One Foundation		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	100
+615	2022-03-31 04:07:28.216498	2022-03-31 04:07:28.216498	\N	Mahaut Primary School School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	75
+616	2022-03-31 04:07:28.264897	2022-03-31 04:07:28.264897	\N	Mahaut Pre-School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	75
+617	2022-03-31 04:07:28.304419	2022-03-31 04:07:28.304419	\N	Mahaut River Pre-School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	30
+618	2022-03-31 04:07:28.344263	2022-03-31 04:07:28.344263	\N	Massacre/Canefield Primary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	323
+619	2022-03-31 04:07:28.38436	2022-03-31 04:07:28.38436	\N	Massacre Pre-School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	40
+620	2022-03-31 04:07:28.426218	2022-03-31 04:07:28.426218	\N	Morne Jaune Primary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	39
+621	2022-03-31 04:07:28.465927	2022-03-31 04:07:28.465927	\N	Morne Prosper Primary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	50
+622	2022-03-31 04:07:28.509544	2022-03-31 04:07:28.509544	\N	Newtown Primary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	296
+623	2022-03-31 04:07:28.554799	2022-03-31 04:07:28.554799	\N	Northeast Comprehensive Secondary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	614
+624	2022-03-31 04:07:28.596692	2022-03-31 04:07:28.596692	\N	Orion Academy		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	54
+625	2022-03-31 04:07:28.634448	2022-03-31 04:07:28.634448	\N	Paix Bouche Primary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	104
+626	2022-03-31 04:07:28.673341	2022-03-31 04:07:28.673341	\N	Penville Primary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	101
+627	2022-03-31 04:07:28.717577	2022-03-31 04:07:28.717577	\N	Petite Savanne Primary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	50
+628	2022-03-31 04:07:28.754523	2022-03-31 04:07:28.754523	\N	Pierre Charles Secondary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	340
+629	2022-03-31 04:07:28.792884	2022-03-31 04:07:28.792884	\N	Pioneer Preparatory School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	124
+630	2022-03-31 04:07:28.831072	2022-03-31 04:07:28.831072	\N	Pioneer Prep Pre-School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	40
+631	2022-03-31 04:07:28.869775	2022-03-31 04:07:28.869775	\N	Portsmouth Secondary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	700
+632	2022-03-31 04:07:28.914373	2022-03-31 04:07:28.914373	\N	Roosevelt Douglas Primary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	311
+633	2022-03-31 04:07:28.954912	2022-03-31 04:07:28.954912	\N	Roseau Primary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	197
+634	2022-03-31 04:07:28.995093	2022-03-31 04:07:28.995093	\N	Roseau Public Library		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	300
+635	2022-03-31 04:07:29.030517	2022-03-31 04:07:29.030517	\N	Salybia Primary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	114
+636	2022-03-31 04:07:29.074758	2022-03-31 04:07:29.074758	\N	Salisbury Primary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	107
+637	2022-03-31 04:07:29.115853	2022-03-31 04:07:29.115853	\N	San Sauveur Primary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	58
+638	2022-03-31 04:07:29.157079	2022-03-31 04:07:29.157079	\N	Savanne Paille Primary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	37
+639	2022-03-31 04:07:29.19967	2022-03-31 04:07:29.19967	\N	Sheba Pre-School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	30
+640	2022-03-31 04:07:29.238391	2022-03-31 04:07:29.238391	\N	Sineku Primary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	98
+641	2022-03-31 04:07:29.27787	2022-03-31 04:07:29.27787	\N	Soufriere Primary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	91
+642	2022-03-31 04:07:29.318715	2022-03-31 04:07:29.318715	\N	St. John's Academy		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	77
+643	2022-03-31 04:07:29.36061	2022-03-31 04:07:29.36061	\N	St. John's RC Primary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	300
+644	2022-03-31 04:07:29.408455	2022-03-31 04:07:29.408455	\N	St. Joseph SDA Primary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	120
+645	2022-03-31 04:07:29.452345	2022-03-31 04:07:29.452345	\N	St. Luke's Primary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	200
+646	2022-03-31 04:07:29.504394	2022-03-31 04:07:29.504394	\N	St. Martin Primary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	654
+647	2022-03-31 04:07:29.560429	2022-03-31 04:07:29.560429	\N	St. Martin Secondary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	245
+648	2022-03-31 04:07:29.598888	2022-03-31 04:07:29.598888	\N	St. Mary's Academy		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	400
+649	2022-03-31 04:07:29.636639	2022-03-31 04:07:29.636639	\N	St. Mary's Primary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	450
+650	2022-03-31 04:07:29.674588	2022-03-31 04:07:29.674588	\N	Temple SDA Primary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	110
+651	2022-03-31 04:07:29.762648	2022-03-31 04:07:29.762648	\N	Tete Morne Primary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	76
+652	2022-03-31 04:07:29.810426	2022-03-31 04:07:29.810426	\N	Thibaud Primary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	28
+653	2022-03-31 04:07:29.850478	2022-03-31 04:07:29.850478	\N	Trafalgar Primary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	30
+654	2022-03-31 04:07:29.898884	2022-03-31 04:07:29.898884	\N	Tunubuku Reference Library		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	22
+655	2022-03-31 04:07:29.939644	2022-03-31 04:07:29.939644	\N	Warner Primary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	48
+656	2022-03-31 04:07:29.987086	2022-03-31 04:07:29.987086	\N	Wesley Primary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	106
+657	2022-03-31 04:07:30.024636	2022-03-31 04:07:30.024636	\N	Willis Strathmore Stevens Primary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	220
+658	2022-03-31 04:07:30.064266	2022-03-31 04:07:30.064266	\N	Woodfordhill Primary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	102
+659	2022-03-31 04:07:30.105116	2022-03-31 04:07:30.105116	\N	Wotten Waven Primary School		f	DOMINICA	\N	\N	\N	\N	UNKNOWN	36
+660	2022-03-31 04:07:30.140422	2022-03-31 04:07:30.140422	\N	Anglican High School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	707
+661	2022-03-31 04:07:30.178885	2022-03-31 04:07:30.178885	\N	Beacon Learning Centre (K-12)		f	GRENADA	\N	\N	\N	\N	UNKNOWN	300
+662	2022-03-31 04:07:30.216632	2022-03-31 04:07:30.216632	\N	Beaulieu RC Primary School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	280
+663	2022-03-31 04:07:30.263877	2022-03-31 04:07:30.263877	\N	Bel Air		f	GRENADA	\N	\N	\N	\N	UNKNOWN	35
+664	2022-03-31 04:07:30.308644	2022-03-31 04:07:30.308644	\N	Blessed Sacrament RC Primary School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	249
+665	2022-03-31 04:07:30.34649	2022-03-31 04:07:30.34649	\N	Boca Secondary School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	457
+666	2022-03-31 04:07:30.39234	2022-03-31 04:07:30.39234	\N	Bonair Government School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	342
+667	2022-03-31 04:07:30.430935	2022-03-31 04:07:30.430935	\N	Chantimelle Roman Catholic School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	91
+668	2022-03-31 04:07:30.470285	2022-03-31 04:07:30.470285	\N	Concord Government School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	110
+669	2022-03-31 04:07:30.506861	2022-03-31 04:07:30.506861	\N	Constantine Methodist Primary School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	157
+670	2022-03-31 04:07:30.546104	2022-03-31 04:07:30.546104	\N	Corinth Government Primary School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	200
+671	2022-03-31 04:07:30.586459	2022-03-31 04:07:30.586459	\N	Dover Government School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	100
+672	2022-03-31 04:07:30.624898	2022-03-31 04:07:30.624898	\N	Florida Government School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	120
+673	2022-03-31 04:07:30.662804	2022-03-31 04:07:30.662804	\N	Grand Roy Government School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	112
+674	2022-03-31 04:07:30.706466	2022-03-31 04:07:30.706466	\N	Grenada Boys Secondary School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	770
+675	2022-03-31 04:07:30.752494	2022-03-31 04:07:30.752494	\N	Grenada Christian Academy		f	GRENADA	\N	\N	\N	\N	UNKNOWN	200
+676	2022-03-31 04:07:30.793415	2022-03-31 04:07:30.793415	\N	Grenada School for Special Education		f	GRENADA	\N	\N	\N	\N	UNKNOWN	82
+677	2022-03-31 04:07:30.830387	2022-03-31 04:07:30.830387	\N	Grenada SDA Comprehensive Secondary School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	250
+678	2022-03-31 04:07:30.872163	2022-03-31 04:07:30.872163	\N	Grenville Secondary School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	525
+679	2022-03-31 04:07:30.910738	2022-03-31 04:07:30.910738	\N	Happy Hill Secondary School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	412
+680	2022-03-31 04:07:30.948668	2022-03-31 04:07:30.948668	\N	Harvey Vale Government School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	36
+681	2022-03-31 04:07:30.988438	2022-03-31 04:07:30.988438	\N	Hillsborough Government School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	100
+682	2022-03-31 04:07:31.026426	2022-03-31 04:07:31.026426	\N	Hillsborough Secondary School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	216
+683	2022-03-31 04:07:31.064926	2022-03-31 04:07:31.064926	\N	Holy Cross RC School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	80
+684	2022-03-31 04:07:31.104758	2022-03-31 04:07:31.104758	\N	Hope Pals		f	GRENADA	\N	\N	\N	\N	UNKNOWN	20
+685	2022-03-31 04:07:31.14387	2022-03-31 04:07:31.14387	\N	J. W. Fletcher Catholic Secondary School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	120
+686	2022-03-31 04:07:31.18528	2022-03-31 04:07:31.18528	\N	L'Esterre Rosary School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	101
+687	2022-03-31 04:07:31.458039	2022-03-31 04:07:31.458039	\N	Limes Government Pre-School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	70
+688	2022-03-31 04:07:31.501046	2022-03-31 04:07:31.501046	\N	MacDonald College		f	GRENADA	\N	\N	\N	\N	UNKNOWN	515
+689	2022-03-31 04:07:31.537067	2022-03-31 04:07:31.537067	\N	Grenada Community Library		f	GRENADA	\N	\N	\N	\N	UNKNOWN	400
+690	2022-03-31 04:07:31.586482	2022-03-31 04:07:31.586482	\N	Mt. Airy Young Readers Program		f	GRENADA	\N	\N	\N	\N	UNKNOWN	100
+691	2022-03-31 04:07:31.624532	2022-03-31 04:07:31.624532	\N	Mt. Moritz Anglican School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	108
+692	2022-03-31 04:07:31.66654	2022-03-31 04:07:31.66654	\N	Mt. Pleasant Government School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	75
+693	2022-03-31 04:07:31.742206	2022-03-31 04:07:31.742206	\N	Mt. Rose SDA Primary School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	121
+694	2022-03-31 04:07:31.846066	2022-03-31 04:07:31.846066	\N	Nation Builders		f	GRENADA	\N	\N	\N	\N	UNKNOWN	100
+695	2022-03-31 04:07:31.897943	2022-03-31 04:07:31.897943	\N	Paraclete Primary School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	150
+696	2022-03-31 04:07:31.95138	2022-03-31 04:07:31.95138	\N	Programme for Adolescent Mothers (Mt. Parnassus)		f	GRENADA	\N	\N	\N	\N	UNKNOWN	25
+697	2022-03-31 04:07:32.04825	2022-03-31 04:07:32.04825	\N	Programme for Adolescent Mothers (Pearls)		f	GRENADA	\N	\N	\N	\N	UNKNOWN	25
+698	2022-03-31 04:07:32.161156	2022-03-31 04:07:32.161156	\N	River Sallee Government Primary School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	105
+699	2022-03-31 04:07:32.21456	2022-03-31 04:07:32.21456	\N	Rose Hill Infant School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	47
+700	2022-03-31 04:07:32.290751	2022-03-31 04:07:32.290751	\N	Roving Caregivers		f	GRENADA	\N	\N	\N	\N	UNKNOWN	60
+701	2022-03-31 04:07:32.355802	2022-03-31 04:07:32.355802	\N	Samaritan Presbyterian Primary School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	298
+702	2022-03-31 04:07:32.500232	2022-03-31 04:07:32.500232	\N	St. Andrew's Anglican Primary School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	275
+703	2022-03-31 04:07:32.556603	2022-03-31 04:07:32.556603	\N	St. Andrew's Anglican Secondary School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	700
+704	2022-03-31 04:07:32.627136	2022-03-31 04:07:32.627136	\N	St. Andrew's Methodist Primary School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	544
+705	2022-03-31 04:07:32.964629	2022-03-31 04:07:32.964629	\N	St. David's Catholic Secondary School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	509
+706	2022-03-31 04:07:33.001861	2022-03-31 04:07:33.001861	\N	St. David's RC Primary School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	245
+707	2022-03-31 04:07:33.041715	2022-03-31 04:07:33.041715	\N	St. Dominic's RC Primary School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	320
+708	2022-03-31 04:07:33.076542	2022-03-31 04:07:33.076542	\N	St. George's Anglican Junior School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	375
+709	2022-03-31 04:07:33.11845	2022-03-31 04:07:33.11845	\N	St. George’s Anglican Senior School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	220
+710	2022-03-31 04:07:33.156409	2022-03-31 04:07:33.156409	\N	St. George's SDA Primary School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	347
+711	2022-03-31 04:07:33.198174	2022-03-31 04:07:33.198174	\N	St. Giles Anglican School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	95
+712	2022-03-31 04:07:33.235376	2022-03-31 04:07:33.235376	\N	St. John's Christian Secondary School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	192
+713	2022-03-31 04:07:33.27645	2022-03-31 04:07:33.27645	\N	St. Joseph's Catholic Primary School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	142
+714	2022-03-31 04:07:33.316617	2022-03-31 04:07:33.316617	\N	St. Joseph's Convent, Grenville		f	GRENADA	\N	\N	\N	\N	UNKNOWN	519
+715	2022-03-31 04:07:33.35635	2022-03-31 04:07:33.35635	\N	St. Joseph's Convent, St. George's		f	GRENADA	\N	\N	\N	\N	UNKNOWN	700
+716	2022-03-31 04:07:33.394512	2022-03-31 04:07:33.394512	\N	St. Joseph's RC Primary School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	315
+717	2022-03-31 04:07:33.432503	2022-03-31 04:07:33.432503	\N	St. Louis RC Girls Primary School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	414
+718	2022-03-31 04:07:33.471606	2022-03-31 04:07:33.471606	\N	St. Mark's Secondary School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	550
+719	2022-03-31 04:07:33.508542	2022-03-31 04:07:33.508542	\N	St. Mary's RC Primary School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	234
+720	2022-03-31 04:07:33.54641	2022-03-31 04:07:33.54641	\N	St. Martin de Porres RC Primary School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	440
+721	2022-03-31 04:07:33.590971	2022-03-31 04:07:33.590971	\N	St. Michael's RC Infant School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	156
+722	2022-03-31 04:07:33.63374	2022-03-31 04:07:33.63374	\N	St. Mathews RC Primary School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	233
+723	2022-03-31 04:07:33.672574	2022-03-31 04:07:33.672574	\N	St. Michael's RC Primary School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	106
+724	2022-03-31 04:07:33.712374	2022-03-31 04:07:33.712374	\N	St. Patrick's Anglican Primary School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	267
+725	2022-03-31 04:07:33.75174	2022-03-31 04:07:33.75174	\N	St. Patrick's RC Primary School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	292
+726	2022-03-31 04:07:33.793643	2022-03-31 04:07:33.793643	\N	St. Peter's RC Primary School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	307
+727	2022-03-31 04:07:33.836413	2022-03-31 04:07:33.836413	\N	St. Rose Modern Secondary School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	326
+728	2022-03-31 04:07:33.880677	2022-03-31 04:07:33.880677	\N	St. Theresa's RC School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	120
+729	2022-03-31 04:07:33.918709	2022-03-31 04:07:33.918709	\N	Sunnyside School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	100
+730	2022-03-31 04:07:33.95896	2022-03-31 04:07:33.95896	\N	Telescope Primary School 		f	GRENADA	\N	\N	\N	\N	UNKNOWN	196
+731	2022-03-31 04:07:34.012644	2022-03-31 04:07:34.012644	\N	Uganda Martyrs Catholic School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	329
+732	2022-03-31 04:07:34.052521	2022-03-31 04:07:34.052521	\N	Vendome RC School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	81
+733	2022-03-31 04:07:34.092489	2022-03-31 04:07:34.092489	\N	Victoria School for Special Education		f	GRENADA	\N	\N	\N	\N	UNKNOWN	36
+734	2022-03-31 04:07:34.130345	2022-03-31 04:07:34.130345	\N	Wesley College		f	GRENADA	\N	\N	\N	\N	UNKNOWN	320
+735	2022-03-31 04:07:34.168582	2022-03-31 04:07:34.168582	\N	Westerhall Secondary School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	454
+736	2022-03-31 04:07:34.212444	2022-03-31 04:07:34.212444	\N	Windsor Forest Pre-School		f	GRENADA	\N	\N	\N	\N	UNKNOWN	39
+737	2022-03-31 04:07:34.254152	2022-03-31 04:07:34.254152	\N	YWCA		f	GRENADA	\N	\N	\N	\N	UNKNOWN	40
+738	2022-03-31 04:07:34.294332	2022-03-31 04:07:34.294332	\N	Blanket Night		f	ST_KITTS_AND_NEVIS	\N	\N	\N	\N	UNKNOWN	0
+739	2022-03-31 04:07:34.331684	2022-03-31 04:07:34.331684	\N	Cecele Brown Integrated School		f	ST_KITTS_AND_NEVIS	\N	\N	\N	\N	UNKNOWN	20
+740	2022-03-31 04:07:34.371854	2022-03-31 04:07:34.371854	\N	Charlestown Library		f	ST_KITTS_AND_NEVIS	\N	\N	\N	\N	UNKNOWN	0
+741	2022-03-31 04:07:34.413793	2022-03-31 04:07:34.413793	\N	Charlestown Primary School		f	ST_KITTS_AND_NEVIS	\N	\N	\N	\N	UNKNOWN	328
+742	2022-03-31 04:07:34.454458	2022-03-31 04:07:34.454458	\N	Charlestown Secondary School		f	ST_KITTS_AND_NEVIS	\N	\N	\N	\N	UNKNOWN	825
+743	2022-03-31 04:07:34.492784	2022-03-31 04:07:34.492784	\N	Elizabeth Pemberton Primary School		f	ST_KITTS_AND_NEVIS	\N	\N	\N	\N	UNKNOWN	85
+744	2022-03-31 04:07:34.762489	2022-03-31 04:07:34.762489	\N	Joycelyn Liburd Primary School		f	ST_KITTS_AND_NEVIS	\N	\N	\N	\N	UNKNOWN	186
+745	2022-03-31 04:07:34.799371	2022-03-31 04:07:34.799371	\N	Gingerland Public Library		f	ST_KITTS_AND_NEVIS	\N	\N	\N	\N	UNKNOWN	0
+746	2022-03-31 04:07:34.839267	2022-03-31 04:07:34.839267	\N	Gingerland Secondary School		f	ST_KITTS_AND_NEVIS	\N	\N	\N	\N	UNKNOWN	285
+747	2022-03-31 04:07:34.877763	2022-03-31 04:07:34.877763	\N	Ivor Walters Primary School		f	ST_KITTS_AND_NEVIS	\N	\N	\N	\N	UNKNOWN	182
+748	2022-03-31 04:07:34.916021	2022-03-31 04:07:34.916021	\N	Nevis Academy		f	ST_KITTS_AND_NEVIS	\N	\N	\N	\N	UNKNOWN	96
+749	2022-03-31 04:07:34.956416	2022-03-31 04:07:34.956416	\N	Operation Future (deunct; their 264 books went to Elizaboth Pemberton)		f	ST_KITTS_AND_NEVIS	\N	\N	\N	\N	UNKNOWN	0
+750	2022-03-31 04:07:34.997949	2022-03-31 04:07:34.997949	\N	St. James Primary School		f	ST_KITTS_AND_NEVIS	\N	\N	\N	\N	UNKNOWN	43
+751	2022-03-31 04:07:35.039075	2022-03-31 04:07:35.039075	\N	St. Thomas' Primary School		f	ST_KITTS_AND_NEVIS	\N	\N	\N	\N	UNKNOWN	211
+752	2022-03-31 04:07:35.082769	2022-03-31 04:07:35.082769	\N	Violet O. Jeffers-Nichols Primary School		f	ST_KITTS_AND_NEVIS	\N	\N	\N	\N	UNKNOWN	73
+753	2022-03-31 04:07:35.122401	2022-03-31 04:07:35.122401	\N	Basseterre High School		f	ST_KITTS_AND_NEVIS	\N	\N	\N	\N	UNKNOWN	760
+754	2022-03-31 04:07:35.161638	2022-03-31 04:07:35.161638	\N	Beach Allen Primary School		f	ST_KITTS_AND_NEVIS	\N	\N	\N	\N	UNKNOWN	380
+755	2022-03-31 04:07:35.20235	2022-03-31 04:07:35.20235	\N	Bronte Welsh Primary School		f	ST_KITTS_AND_NEVIS	\N	\N	\N	\N	UNKNOWN	110
+756	2022-03-31 04:07:35.242486	2022-03-31 04:07:35.242486	\N	Cayon Primary School		f	ST_KITTS_AND_NEVIS	\N	\N	\N	\N	UNKNOWN	238
+757	2022-03-31 04:07:35.284859	2022-03-31 04:07:35.284859	\N	Cayon High School		f	ST_KITTS_AND_NEVIS	\N	\N	\N	\N	UNKNOWN	362
+758	2022-03-31 04:07:35.327076	2022-03-31 04:07:35.327076	\N	Charles A. Halbert Public Library		f	ST_KITTS_AND_NEVIS	\N	\N	\N	\N	UNKNOWN	1662
+759	2022-03-31 04:07:35.542585	2022-03-31 04:07:35.542585	\N	Charles E. Mills Secondary School		f	ST_KITTS_AND_NEVIS	\N	\N	\N	\N	UNKNOWN	440
+760	2022-03-31 04:07:35.584543	2022-03-31 04:07:35.584543	\N	Clarence Fitzroy Bryant CC		f	ST_KITTS_AND_NEVIS	\N	\N	\N	\N	UNKNOWN	50
+761	2022-03-31 04:07:35.624511	2022-03-31 04:07:35.624511	\N	Deane-Glasford Primary School		f	ST_KITTS_AND_NEVIS	\N	\N	\N	\N	UNKNOWN	165
+762	2022-03-31 04:07:35.662609	2022-03-31 04:07:35.662609	\N	Dieppe Bay Primary School		f	ST_KITTS_AND_NEVIS	\N	\N	\N	\N	UNKNOWN	98
+763	2022-03-31 04:07:35.703779	2022-03-31 04:07:35.703779	\N	Dieppe Bay Pre-School		f	ST_KITTS_AND_NEVIS	\N	\N	\N	\N	UNKNOWN	39
+764	2022-03-31 04:07:35.743332	2022-03-31 04:07:35.743332	\N	Dr. William Connor Primary School		f	ST_KITTS_AND_NEVIS	\N	\N	\N	\N	UNKNOWN	350
+765	2022-03-31 04:07:35.782342	2022-03-31 04:07:35.782342	\N	Edgar T Morris Primary School		f	ST_KITTS_AND_NEVIS	\N	\N	\N	\N	UNKNOWN	57
+766	2022-03-31 04:07:35.820495	2022-03-31 04:07:35.820495	\N	Estridge Primary School		f	ST_KITTS_AND_NEVIS	\N	\N	\N	\N	UNKNOWN	45
+767	2022-03-31 04:07:35.861565	2022-03-31 04:07:35.861565	\N	Irishtown Primary School		f	ST_KITTS_AND_NEVIS	\N	\N	\N	\N	UNKNOWN	150
+768	2022-03-31 04:07:35.900283	2022-03-31 04:07:35.900283	\N	Joshua O. Williams Primary School		f	ST_KITTS_AND_NEVIS	\N	\N	\N	\N	UNKNOWN	122
+769	2022-03-31 04:07:35.941759	2022-03-31 04:07:35.941759	\N	Maurice Hillier Memorial Junior School		f	ST_KITTS_AND_NEVIS	\N	\N	\N	\N	UNKNOWN	262
+770	2022-03-31 04:07:35.982128	2022-03-31 04:07:35.982128	\N	Ministry of Education		f	ST_KITTS_AND_NEVIS	\N	\N	\N	\N	UNKNOWN	0
+771	2022-03-31 04:07:36.028266	2022-03-31 04:07:36.028266	\N	Newton Ground Primary School		f	ST_KITTS_AND_NEVIS	\N	\N	\N	\N	UNKNOWN	77
+772	2022-03-31 04:07:36.064138	2022-03-31 04:07:36.064138	\N	Saddlers Primary School		f	ST_KITTS_AND_NEVIS	\N	\N	\N	\N	UNKNOWN	102
+773	2022-03-31 04:07:36.100483	2022-03-31 04:07:36.100483	\N	Saddler's Secondary School		f	ST_KITTS_AND_NEVIS	\N	\N	\N	\N	UNKNOWN	220
+774	2022-03-31 04:07:36.151621	2022-03-31 04:07:36.151621	\N	Sandy Point Primary School		f	ST_KITTS_AND_NEVIS	\N	\N	\N	\N	UNKNOWN	343
+775	2022-03-31 04:07:36.190455	2022-03-31 04:07:36.190455	\N	SKI Academy		f	ST_KITTS_AND_NEVIS	\N	\N	\N	\N	UNKNOWN	140
+776	2022-03-31 04:07:36.228416	2022-03-31 04:07:36.228416	\N	St. Christopher Children's Home 		f	ST_KITTS_AND_NEVIS	\N	\N	\N	\N	UNKNOWN	15
+777	2022-03-31 04:07:36.267841	2022-03-31 04:07:36.267841	\N	St. Kitts Spectrum Services Centre		f	ST_KITTS_AND_NEVIS	\N	\N	\N	\N	UNKNOWN	35
+778	2022-03-31 04:07:36.312517	2022-03-31 04:07:36.312517	\N	St. Paul's Primary School		f	ST_KITTS_AND_NEVIS	\N	\N	\N	\N	UNKNOWN	165
+779	2022-03-31 04:07:36.352463	2022-03-31 04:07:36.352463	\N	Teachers' Resouce Center		f	ST_KITTS_AND_NEVIS	\N	\N	\N	\N	UNKNOWN	0
+780	2022-03-31 04:07:36.395762	2022-03-31 04:07:36.395762	\N	Tucker Clarke Primary School		f	ST_KITTS_AND_NEVIS	\N	\N	\N	\N	UNKNOWN	450
+781	2022-03-31 04:07:36.442181	2022-03-31 04:07:36.442181	\N	Tyrell Williams Primary School		f	ST_KITTS_AND_NEVIS	\N	\N	\N	\N	UNKNOWN	221
+782	2022-03-31 04:07:36.480395	2022-03-31 04:07:36.480395	\N	Verchilds High School		f	ST_KITTS_AND_NEVIS	\N	\N	\N	\N	UNKNOWN	325
+783	2022-03-31 04:07:36.52288	2022-03-31 04:07:36.52288	\N	Violet Petty Primary School 		f	ST_KITTS_AND_NEVIS	\N	\N	\N	\N	UNKNOWN	89
+784	2022-03-31 04:07:36.55873	2022-03-31 04:07:36.55873	\N	Washington Archibald High School		f	ST_KITTS_AND_NEVIS	\N	\N	\N	\N	UNKNOWN	895
+785	2022-03-31 04:07:36.598489	2022-03-31 04:07:36.598489	\N	Anse Ger Secondary School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	379
+786	2022-03-31 04:07:36.636483	2022-03-31 04:07:36.636483	\N	Anse La Raye Infant School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	84
+787	2022-03-31 04:07:36.676697	2022-03-31 04:07:36.676697	\N	Anse La Raye Primary School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	94
+788	2022-03-31 04:07:36.721082	2022-03-31 04:07:36.721082	\N	Augier Combined School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	286
+789	2022-03-31 04:07:36.762344	2022-03-31 04:07:36.762344	\N	Aux Lyons Combined School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	186
+790	2022-03-31 04:07:36.804571	2022-03-31 04:07:36.804571	\N	Ave Maria RC Infant School (Grades K-2)		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	400
+791	2022-03-31 04:07:36.843526	2022-03-31 04:07:36.843526	\N	Ave Maria RC Primary School (Grades 3-6)		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	533
+792	2022-03-31 04:07:36.884342	2022-03-31 04:07:36.884342	\N	Babonneau Primary School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	250
+793	2022-03-31 04:07:36.926621	2022-03-31 04:07:36.926621	\N	Babonneau Secondary School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	545
+794	2022-03-31 04:07:36.965643	2022-03-31 04:07:36.965643	\N	Balata Primary School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	143
+795	2022-03-31 04:07:37.010083	2022-03-31 04:07:37.010083	\N	Banse la Grace Combined School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	100
+796	2022-03-31 04:07:37.066455	2022-03-31 04:07:37.066455	\N	Beanefield Comprehensive Secondary School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	488
+797	2022-03-31 04:07:37.108085	2022-03-31 04:07:37.108085	\N	Belle Vue Combined School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	106
+798	2022-03-31 04:07:37.146738	2022-03-31 04:07:37.146738	\N	Bexon Infant School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	106
+799	2022-03-31 04:07:37.188523	2022-03-31 04:07:37.188523	\N	Bexon Primary School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	119
+800	2022-03-31 04:07:37.224025	2022-03-31 04:07:37.224025	\N	Blanchard Primary		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	152
+801	2022-03-31 04:07:37.259858	2022-03-31 04:07:37.259858	\N	Bocage Secondary School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	130
+802	2022-03-31 04:07:37.300676	2022-03-31 04:07:37.300676	\N	Boguis Primary School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	62
+803	2022-03-31 04:07:37.340448	2022-03-31 04:07:37.340448	\N	Bonne Terre Prepatory School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	175
+804	2022-03-31 04:07:37.376647	2022-03-31 04:07:37.376647	\N	Bouton RC Combined School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	46
+805	2022-03-31 04:07:37.418178	2022-03-31 04:07:37.418178	\N	Canaries Infant School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	81
+806	2022-03-31 04:07:37.456502	2022-03-31 04:07:37.456502	\N	Canaries Public Lirary		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	0
+807	2022-03-31 04:07:37.497638	2022-03-31 04:07:37.497638	\N	Cannon Laurie Anglican Primary School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	350
+808	2022-03-31 04:07:37.533432	2022-03-31 04:07:37.533432	\N	Castries Anglican Infant School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	236
+809	2022-03-31 04:07:37.576719	2022-03-31 04:07:37.576719	\N	Central Library of St. Lucia 		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	1500
+810	2022-03-31 04:07:37.621744	2022-03-31 04:07:37.621744	\N	Centre For Adolescent Renewal and Education (CARE) 		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	0
+811	2022-03-31 04:07:37.66444	2022-03-31 04:07:37.66444	\N	Children's Literacy Action Programme		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	45
+812	2022-03-31 04:07:37.703289	2022-03-31 04:07:37.703289	\N	Ciceron RC Combined School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	240
+813	2022-03-31 04:07:37.73941	2022-03-31 04:07:37.73941	\N	Ciceron Secondary School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	520
+814	2022-03-31 04:07:37.778756	2022-03-31 04:07:37.778756	\N	Choiseul Secondary School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	700
+815	2022-03-31 04:07:37.817109	2022-03-31 04:07:37.817109	\N	Clendon Mason Memorial Secondary School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	540
+816	2022-03-31 04:07:37.855502	2022-03-31 04:07:37.855502	\N	Corinth Secondary School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	670
+817	2022-03-31 04:07:37.900127	2022-03-31 04:07:37.900127	\N	Court Diversion Programme		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	40
+818	2022-03-31 04:07:37.944639	2022-03-31 04:07:37.944639	\N	Dame Pearlette Louisy Primary School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	950
+819	2022-03-31 04:07:37.985198	2022-03-31 04:07:37.985198	\N	Delcer RC Combined School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	151
+820	2022-03-31 04:07:38.025197	2022-03-31 04:07:38.025197	\N	Dennery Infant School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	203
+821	2022-03-31 04:07:38.072497	2022-03-31 04:07:38.072497	\N	Dennery Pre-School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	0
+822	2022-03-31 04:07:38.110348	2022-03-31 04:07:38.110348	\N	Dennery Primary School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	253
+823	2022-03-31 04:07:38.148483	2022-03-31 04:07:38.148483	\N	Derniere Riviere Combined School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	180
+824	2022-03-31 04:07:38.19633	2022-03-31 04:07:38.19633	\N	Desruisseaux Combined School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	219
+825	2022-03-31 04:07:38.245008	2022-03-31 04:07:38.245008	\N	Des Barras Combined School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	52
+826	2022-03-31 04:07:38.28232	2022-03-31 04:07:38.28232	\N	Dugard Combined School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	90
+827	2022-03-31 04:07:38.326042	2022-03-31 04:07:38.326042	\N	Entrepot Secondary School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	658
+828	2022-03-31 04:07:38.364724	2022-03-31 04:07:38.364724	\N	Fay Stars Sports & Youth Club		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	0
+829	2022-03-31 04:07:38.402973	2022-03-31 04:07:38.402973	\N	Fond Assau Primary School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	133
+830	2022-03-31 04:07:38.444057	2022-03-31 04:07:38.444057	\N	Fond St. Jacques Primary School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	163
+831	2022-03-31 04:07:38.481559	2022-03-31 04:07:38.481559	\N	Forestiere Methodist Combined School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	85
+832	2022-03-31 04:07:38.52294	2022-03-31 04:07:38.52294	\N	Fortuna Anthony Preschools		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	0
+833	2022-03-31 04:07:38.563008	2022-03-31 04:07:38.563008	\N	Grace RC Combined School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	130
+834	2022-03-31 04:07:38.608814	2022-03-31 04:07:38.608814	\N	Grande Riviere Primary School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	250
+835	2022-03-31 04:07:38.648782	2022-03-31 04:07:38.648782	\N	Gros Islet Infant School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	135
+836	2022-03-31 04:07:38.690529	2022-03-31 04:07:38.690529	\N	Gros Islet Primary School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	179
+837	2022-03-31 04:07:38.730348	2022-03-31 04:07:38.730348	\N	Gros Islet Secondary School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	504
+838	2022-03-31 04:07:38.768087	2022-03-31 04:07:38.768087	\N	Kiddy's Homey Day Care		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	30
+839	2022-03-31 04:07:38.808986	2022-03-31 04:07:38.808986	\N	Kid's Step DC		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	30
+840	2022-03-31 04:07:38.848677	2022-03-31 04:07:38.848677	\N	L'Abayee SDA Primary School  198		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	198
+841	2022-03-31 04:07:38.889972	2022-03-31 04:07:38.889972	\N	La Croix Maingot Combined School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	375
+842	2022-03-31 04:07:38.928249	2022-03-31 04:07:38.928249	\N	Lady Gordon Opportunity Centre		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	90
+843	2022-03-31 04:07:38.967344	2022-03-31 04:07:38.967344	\N	La Guerre Combined School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	118
+844	2022-03-31 04:07:39.015697	2022-03-31 04:07:39.015697	\N	La Ressource RC Combined School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	154
+845	2022-03-31 04:07:39.055476	2022-03-31 04:07:39.055476	\N	Laborie RC Boys Primary School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	110
+846	2022-03-31 04:07:39.099508	2022-03-31 04:07:39.099508	\N	Laborie RC Girls Primary School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	162
+847	2022-03-31 04:07:39.137551	2022-03-31 04:07:39.137551	\N	Marchand RC Combined School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	196
+848	2022-03-31 04:07:39.177294	2022-03-31 04:07:39.177294	\N	Micoud Public Library		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	0
+849	2022-03-31 04:07:39.221957	2022-03-31 04:07:39.221957	\N	Micoud Primary School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	396
+850	2022-03-31 04:07:39.260509	2022-03-31 04:07:39.260509	\N	Micoud Secondary School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	679
+851	2022-03-31 04:07:39.304019	2022-03-31 04:07:39.304019	\N	Millet Infant School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	70
+852	2022-03-31 04:07:39.348211	2022-03-31 04:07:39.348211	\N	Millet Primary School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	104
+853	2022-03-31 04:07:39.39188	2022-03-31 04:07:39.39188	\N	Mirja Sachs Pre-School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	0
+854	2022-03-31 04:07:39.430476	2022-03-31 04:07:39.430476	\N	Mon Repos Combined School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	165
+855	2022-03-31 04:07:39.473034	2022-03-31 04:07:39.473034	\N	Monchy RC Combined School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	210
+856	2022-03-31 04:07:39.519581	2022-03-31 04:07:39.519581	\N	Mongouge Combined School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	105
+857	2022-03-31 04:07:39.561211	2022-03-31 04:07:39.561211	\N	Montessori School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	280
+858	2022-03-31 04:07:39.602436	2022-03-31 04:07:39.602436	\N	Morne Du Don Primary School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	290
+859	2022-03-31 04:07:39.64084	2022-03-31 04:07:39.64084	\N	Odsan Combined School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	188
+860	2022-03-31 04:07:39.680507	2022-03-31 04:07:39.680507	\N	Piaye Combined School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	110
+861	2022-03-31 04:07:39.724577	2022-03-31 04:07:39.724577	\N	Piaye Secondary School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	182
+862	2022-03-31 04:07:39.984563	2022-03-31 04:07:39.984563	\N	Plain View Combined School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	600
+863	2022-03-31 04:07:40.049964	2022-03-31 04:07:40.049964	\N	Reunion Primary School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	164
+864	2022-03-31 04:07:40.102513	2022-03-31 04:07:40.102513	\N	Riviere Doree Anglican School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	100
+865	2022-03-31 04:07:40.182367	2022-03-31 04:07:40.182367	\N	Roblot Commuinty Library		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	0
+866	2022-03-31 04:07:40.24312	2022-03-31 04:07:40.24312	\N	Roblot Combined School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	54
+867	2022-03-31 04:07:40.298524	2022-03-31 04:07:40.298524	\N	Richfond Combined School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	240
+868	2022-03-31 04:07:40.343798	2022-03-31 04:07:40.343798	\N	Roseau RC Combined School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	138
+869	2022-03-31 04:07:40.662037	2022-03-31 04:07:40.662037	\N	Saltibus RC Combined Shool		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	110
+870	2022-03-31 04:07:40.719719	2022-03-31 04:07:40.719719	\N	St. Aloysius RC Boys Infant School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	276
+871	2022-03-31 04:07:40.805037	2022-03-31 04:07:40.805037	\N	St. Aloysius RC Boys Primary School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	399
+872	2022-03-31 04:07:40.902588	2022-03-31 04:07:40.902588	\N	Sir Ira Simmons Secondary School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	900
+873	2022-03-31 04:07:41.001785	2022-03-31 04:07:41.001785	\N	Soufriere Primary School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	231
+874	2022-03-31 04:07:41.040536	2022-03-31 04:07:41.040536	\N	Soufriere Public Library		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	0
+875	2022-03-31 04:07:41.161488	2022-03-31 04:07:41.161488	\N	Soufriere Infant School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	190
+876	2022-03-31 04:07:41.202927	2022-03-31 04:07:41.202927	\N	Soufriere Secondary School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	550
+877	2022-03-31 04:07:41.242553	2022-03-31 04:07:41.242553	\N	Soufriere Special Education & Rehabilitation Centre		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	45
+878	2022-03-31 04:07:41.308681	2022-03-31 04:07:41.308681	\N	Stanley Jon Odlum Secondary School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	365
+879	2022-03-31 04:07:41.348339	2022-03-31 04:07:41.348339	\N	Tapion School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	162
+880	2022-03-31 04:07:41.39087	2022-03-31 04:07:41.39087	\N	Ti Rocher RC Primary School (Castries)		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	150
+881	2022-03-31 04:07:41.431203	2022-03-31 04:07:41.431203	\N	Vide Bouteille Primary School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	460
+882	2022-03-31 04:07:41.471843	2022-03-31 04:07:41.471843	\N	Vide Bouteille Secondary School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	600
+883	2022-03-31 04:07:41.512842	2022-03-31 04:07:41.512842	\N	Vieux Fort Comprehensive Secondary School, Campus B		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	1200
+884	2022-03-31 04:07:41.548199	2022-03-31 04:07:41.548199	\N	Vieux Fort Infant School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	199
+885	2022-03-31 04:07:41.588471	2022-03-31 04:07:41.588471	\N	Vieux Fort Primary School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	231
+886	2022-03-31 04:07:41.626557	2022-03-31 04:07:41.626557	\N	Vieux Fort Special Education School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	81
+887	2022-03-31 04:07:41.667574	2022-03-31 04:07:41.667574	\N	Vieux Fort Public Library		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	0
+888	2022-03-31 04:07:41.708604	2022-03-31 04:07:41.708604	\N	Vige Primary School		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	48
+889	2022-03-31 04:07:41.74477	2022-03-31 04:07:41.74477	\N	Wiltons Yard Association		f	ST_LUCIA	\N	\N	\N	\N	UNKNOWN	40
+890	2022-03-31 04:07:41.81999	2022-03-31 04:07:41.81999	\N	Adelphi Secondary School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	203
+891	2022-03-31 04:07:41.857208	2022-03-31 04:07:41.857208	\N	Argyle RC Primary School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	96
+892	2022-03-31 04:07:41.896615	2022-03-31 04:07:41.896615	\N	Barrouallie Anglican Primary School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	211
+893	2022-03-31 04:07:41.934827	2022-03-31 04:07:41.934827	\N	Barrouallie Government School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	324
+894	2022-03-31 04:07:41.974935	2022-03-31 04:07:41.974935	\N	Belmont Government Primary School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	183
+895	2022-03-31 04:07:42.018602	2022-03-31 04:07:42.018602	\N	Bequia Anglican Primary School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	266
+896	2022-03-31 04:07:42.073689	2022-03-31 04:07:42.073689	\N	Bequia Community High School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	130
+897	2022-03-31 04:07:42.11449	2022-03-31 04:07:42.11449	\N	Bequia Reading Group		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	60
+898	2022-03-31 04:07:42.152744	2022-03-31 04:07:42.152744	\N	Bequia SDA Primary School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	55
+899	2022-03-31 04:07:42.19257	2022-03-31 04:07:42.19257	\N	Bequia SDA Secondary School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	105
+900	2022-03-31 04:07:42.230803	2022-03-31 04:07:42.230803	\N	Bethel High School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	603
+901	2022-03-31 04:07:42.268709	2022-03-31 04:07:42.268709	\N	Bethel Pre-School (Fitz-Hughes)		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	30
+902	2022-03-31 04:07:42.308378	2022-03-31 04:07:42.308378	\N	Biabou Methodist Primary School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	140
+903	2022-03-31 04:07:42.346629	2022-03-31 04:07:42.346629	\N	Brighton Methodist School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	216
+904	2022-03-31 04:07:42.390369	2022-03-31 04:07:42.390369	\N	Brighton Reading Group		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	20
+905	2022-03-31 04:07:42.432741	2022-03-31 04:07:42.432741	\N	Buccament Bay Secondary School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	232
+906	2022-03-31 04:07:42.468462	2022-03-31 04:07:42.468462	\N	Buccament Government School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	200
+907	2022-03-31 04:07:42.510448	2022-03-31 04:07:42.510448	\N	Cane End Govt School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	122
+908	2022-03-31 04:07:42.550497	2022-03-31 04:07:42.550497	\N	Calder Government School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	69
+909	2022-03-31 04:07:42.611879	2022-03-31 04:07:42.611879	\N	Calliaqua Anglican Primary School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	310
+910	2022-03-31 04:07:42.654616	2022-03-31 04:07:42.654616	\N	Central Leeward Secondary School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	525
+911	2022-03-31 04:07:42.704572	2022-03-31 04:07:42.704572	\N	Chateaubelair Red Cross Pre-School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	30
+912	2022-03-31 04:07:42.744508	2022-03-31 04:07:42.744508	\N	Chateaubelair Methodist Primary School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	226
+913	2022-03-31 04:07:42.783477	2022-03-31 04:07:42.783477	\N	Cheryl's Reading Club (Bequia)		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	30
+914	2022-03-31 04:07:42.824914	2022-03-31 04:07:42.824914	\N	Clare Valley Government School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	150
+915	2022-03-31 04:07:42.887716	2022-03-31 04:07:42.887716	\N	Colonaire Primary School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	107
+916	2022-03-31 04:07:42.930008	2022-03-31 04:07:42.930008	\N	CW Prescod Primary School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	30
+917	2022-03-31 04:07:42.982573	2022-03-31 04:07:42.982573	\N	Diamond Government School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	93
+918	2022-03-31 04:07:43.023991	2022-03-31 04:07:43.023991	\N	Dorsetshire Hill Government School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	60
+919	2022-03-31 04:07:43.062984	2022-03-31 04:07:43.062984	\N	Emmanuel High School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	700
+920	2022-03-31 04:07:43.100602	2022-03-31 04:07:43.100602	\N	Evesham Methodist School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	86
+921	2022-03-31 04:07:43.138358	2022-03-31 04:07:43.138358	\N	Fancy Government School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	63
+922	2022-03-31 04:07:43.178566	2022-03-31 04:07:43.178566	\N	Fitz-Hughes Pre-school		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	30
+923	2022-03-31 04:07:43.21862	2022-03-31 04:07:43.21862	\N	Fitz-Hughes Government School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	160
+924	2022-03-31 04:07:43.25804	2022-03-31 04:07:43.25804	\N	George Stephens Senior Secondary		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	350
+925	2022-03-31 04:07:43.296539	2022-03-31 04:07:43.296539	\N	Georgetown Government School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	380
+926	2022-03-31 04:07:43.336452	2022-03-31 04:07:43.336452	\N	Georgetown Secondary School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	553
+927	2022-03-31 04:07:43.374502	2022-03-31 04:07:43.374502	\N	Golden Grove Pre-school, Chateaubelair		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	30
+928	2022-03-31 04:07:43.41782	2022-03-31 04:07:43.41782	\N	Greggs Primary School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	150
+929	2022-03-31 04:07:43.470696	2022-03-31 04:07:43.470696	\N	Hospital Children's Ward		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	0
+930	2022-03-31 04:07:43.522543	2022-03-31 04:07:43.522543	\N	Intermediate High School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	350
+931	2022-03-31 04:07:43.560798	2022-03-31 04:07:43.560798	\N	JEMS Progressive Organization pre-School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	30
+932	2022-03-31 04:07:43.604538	2022-03-31 04:07:43.604538	\N	Dr. J. P. Eustace Memorial Secondary School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	180
+933	2022-03-31 04:07:43.642711	2022-03-31 04:07:43.642711	\N	Evesham Methodist School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	88
+934	2022-03-31 04:07:43.690477	2022-03-31 04:07:43.690477	\N	Fairhall Government School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	263
+935	2022-03-31 04:07:43.724599	2022-03-31 04:07:43.724599	\N	Fancy Government School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	64
+936	2022-03-31 04:07:43.764297	2022-03-31 04:07:43.764297	\N	Judy's Pre-School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	23
+937	2022-03-31 04:07:43.806195	2022-03-31 04:07:43.806195	\N	Kearton's United Community Organization		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	0
+938	2022-03-31 04:07:43.844511	2022-03-31 04:07:43.844511	\N	Kingstown Anglican School Annex (Grades K-2)		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	170
+939	2022-03-31 04:07:43.882823	2022-03-31 04:07:43.882823	\N	Kingstown Anglican School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	515
+940	2022-03-31 04:07:43.922901	2022-03-31 04:07:43.922901	\N	Kingstown Government School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	400
+941	2022-03-31 04:07:43.956812	2022-03-31 04:07:43.956812	\N	Kingstown Preparatory School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	910
+942	2022-03-31 04:07:43.998591	2022-03-31 04:07:43.998591	\N	Langley Park Government School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	252
+943	2022-03-31 04:07:44.036934	2022-03-31 04:07:44.036934	\N	Lauders Primary School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	153
+944	2022-03-31 04:07:44.079589	2022-03-31 04:07:44.079589	\N	Layou Government School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	250
+945	2022-03-31 04:07:44.118416	2022-03-31 04:07:44.118416	\N	Learning Centre (Bequia)		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	30
+946	2022-03-31 04:07:44.1584	2022-03-31 04:07:44.1584	\N	Leeward District SDA Primary School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	78
+947	2022-03-31 04:07:44.198461	2022-03-31 04:07:44.198461	\N	Lodge Village Government School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	385
+948	2022-03-31 04:07:44.236444	2022-03-31 04:07:44.236444	\N	Lower Bay Primary School (ex Paradise Primary)		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	35
+949	2022-03-31 04:07:44.275574	2022-03-31 04:07:44.275574	\N	Lowmans Leeward Anglican School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	443
+950	2022-03-31 04:07:44.31449	2022-03-31 04:07:44.31449	\N	Lowmans Windward Anglican School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	81
+951	2022-03-31 04:07:44.352593	2022-03-31 04:07:44.352593	\N	Mammy Joy's Reading Group (Chateaubelair)		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	60
+952	2022-03-31 04:07:44.394626	2022-03-31 04:07:44.394626	\N	Marriaqua Government School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	282
+953	2022-03-31 04:07:44.432071	2022-03-31 04:07:44.432071	\N	Marriaqua Public Library		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	0
+954	2022-03-31 04:07:44.470374	2022-03-31 04:07:44.470374	\N	Mary Hutchinson Primary School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	115
+955	2022-03-31 04:07:44.512459	2022-03-31 04:07:44.512459	\N	Mayreau Primary		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	42
+956	2022-03-31 04:07:44.550991	2022-03-31 04:07:44.550991	\N	Ministry of Education, Jocelyn Blake-Brown		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	0
+957	2022-03-31 04:07:44.590024	2022-03-31 04:07:44.590024	\N	Mountain View Adventist Academy		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	260
+958	2022-03-31 04:07:44.629316	2022-03-31 04:07:44.629316	\N	Naima Dynamites Reading Group		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	0
+959	2022-03-31 04:07:44.668129	2022-03-31 04:07:44.668129	\N	New Grounds Primary School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	257
+960	2022-03-31 04:07:44.71035	2022-03-31 04:07:44.71035	\N	New Prospect Primary School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	40
+961	2022-03-31 04:07:44.747112	2022-03-31 04:07:44.747112	\N	North Union Secondary School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	395
+962	2022-03-31 04:07:44.78851	2022-03-31 04:07:44.78851	\N	Owia Government School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	174
+963	2022-03-31 04:07:44.826833	2022-03-31 04:07:44.826833	\N	Paget Farm Government School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	156
+964	2022-03-31 04:07:44.866559	2022-03-31 04:07:44.866559	\N	Pamelus Burke Government School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	125
+965	2022-03-31 04:07:44.90262	2022-03-31 04:07:44.90262	\N	Park Hill Government School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	120
+966	2022-03-31 04:07:44.94455	2022-03-31 04:07:44.94455	\N	Petit Bordel Secondary School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	302
+967	2022-03-31 04:07:44.983214	2022-03-31 04:07:44.983214	\N	Questelles Government School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	346
+968	2022-03-31 04:07:45.024682	2022-03-31 04:07:45.024682	\N	Richland Park Government School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	200
+969	2022-03-31 04:07:45.102231	2022-03-31 04:07:45.102231	\N	Richland Park SDA Primary School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	130
+970	2022-03-31 04:07:45.166654	2022-03-31 04:07:45.166654	\N	Rose Hall Government School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	105
+971	2022-03-31 04:07:45.20275	2022-03-31 04:07:45.20275	\N	Sandy Bay Government School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	284
+972	2022-03-31 04:07:45.2429	2022-03-31 04:07:45.2429	\N	Sandy Bay Secondary School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	230
+973	2022-03-31 04:07:45.280453	2022-03-31 04:07:45.280453	\N	School for Children with Special Needs Kingstown		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	64
+974	2022-03-31 04:07:45.320664	2022-03-31 04:07:45.320664	\N	Sion Hill Government School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	146
+975	2022-03-31 04:07:45.36004	2022-03-31 04:07:45.36004	\N	South Rivers Methodist Primary School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	182
+976	2022-03-31 04:07:45.402209	2022-03-31 04:07:45.402209	\N	Spring Village Methodist Primary		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	104
+977	2022-03-31 04:07:45.442653	2022-03-31 04:07:45.442653	\N	St. Clair Dacon Secondary School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	320
+978	2022-03-31 04:07:45.480569	2022-03-31 04:07:45.480569	\N	St. Vincent Girls High School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	670
+979	2022-03-31 04:07:45.522377	2022-03-31 04:07:45.522377	\N	St. Vincent National Library		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	0
+980	2022-03-31 04:07:45.560563	2022-03-31 04:07:45.560563	\N	Stephanie Browne Primary School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	168
+981	2022-03-31 04:07:45.601441	2022-03-31 04:07:45.601441	\N	Stubbs Goverment School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	210
+982	2022-03-31 04:07:45.6365	2022-03-31 04:07:45.6365	\N	School for Children with Special Needs Georgetown		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	20
+983	2022-03-31 04:07:45.671967	2022-03-31 04:07:45.671967	\N	Tourama Government School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	103
+984	2022-03-31 04:07:45.709764	2022-03-31 04:07:45.709764	\N	Troumaca Government School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	205
+985	2022-03-31 04:07:45.749476	2022-03-31 04:07:45.749476	\N	Troumaca Ontario Secondary School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	262
+986	2022-03-31 04:07:45.788916	2022-03-31 04:07:45.788916	\N	Union Island Secondary School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	184
+987	2022-03-31 04:07:45.826409	2022-03-31 04:07:45.826409	\N	Westwood Methodist Primary School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	52
+988	2022-03-31 04:07:45.862519	2022-03-31 04:07:45.862519	\N	West St. George Secondary School		f	ST_VINCENT_AND_THE_GRENADINES	\N	\N	\N	\N	UNKNOWN	358
+583	2022-03-31 04:07:26.960705	2022-04-08 15:10:30.94211	\N	Castle Bruce Secondary School		f	DOMINICA	\N	\N	\N	\N	EXISTS	468
+\.
+
+
+--
+-- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.users (id, created_at, updated_at, deleted_at, email, email_verified, first_name, last_name, privilege_level, country, password_hash, disabled) FROM stdin;
+9	2021-07-20 19:18:37.595602	2021-07-20 19:18:45.679439	\N	info@handsacrossthesea.org	f	Amanda	Sherlip	ADMIN	UNITED_STATES	\\x3dd2e7c8dde446ef43b2e35a2b6a97cc85052e974bd5bac2fb151782a935508e258c7c4c047998511c673c27be5dd8c2	f
+6	2021-05-11 17:12:36.028584	2021-08-10 13:50:59.281942	\N	standard@gmail.com	f	Standard	HATS	VOLUNTEER	UNITED_STATES	\\x07026b65d16407cc939d1b930d391f39843ad1c8c99752ce58b4c53f3fcbc317480c08adbe647e04bc02eb1d1d1b1576	f
+7	2021-07-20 17:12:58.803582	2021-08-10 13:50:59.281942	\N	jcktonina@icloud.com	f	Jack	Tonina	VOLUNTEER	UNITED_STATES	\\xae8b4a4ecd4bd5cdf813de9a77e05e49756b63ccbf7cc7bd77975f6cdc388872b250940e96da25c78a5829fd3f646a96	f
+5	2021-05-11 16:50:51.184869	2021-09-27 22:00:12.169329	\N	admin@gmail.com	f	Admin	HATS	ADMIN	UNITED_STATES	\\x0dfdfc63080a4ad6a4a5220c621fbde4b9eeb66b147877a4f9124b98202b2dad20f51836ec635956a23c2917acca7082	f
+3	2020-12-06 21:32:15.300133	2021-09-30 22:08:33.573726	\N	konecnyjustin@gmail.com	f	Justin	Konecny	VOLUNTEER	UNITED_STATES	\\x87082edfdacf0ede9054220168c057e10f8a24a71a370cdb2527f2e1f2b5f8ce0c4ac3f245ebad32e8cd21dfee97e132	f
+4	2021-05-11 16:25:59.976676	2022-04-02 22:53:10.273125	\N	mseb@c4c.com	f	Max	S	VOLUNTEER	UNITED_STATES	\\xffd7d50d9880f054855bf89906607cd23c7b430bdb2606ef463f50a8c2f8b5270e5415a8faad5d1949faab469c0019fd	f
+11	2022-04-02 23:40:34.726326	2022-04-02 23:44:51.245085	\N	volunteer@gmail.com	f	Test	Volunteer	VOLUNTEER	ST_LUCIA	\\x259f997d19cf066560154d7e1c448b4faf378578f1608cb2466a24e9e374b116d066be28e1ccbcc7a9c48cd7b34ae422	f
+10	2022-04-02 22:56:28.187808	2022-04-03 19:10:50.725467	\N	testu@c4c.com	f	Test	User	OFFICER	DOMINICA	\\xc6bc93e6a8289cf313518b5b6b36d1cf57638f58cdc1a620dd19de24ef3cc54607739d3c7ef4db7c066b1a99dc21e8bf	f
+8	2021-07-20 19:16:57.649741	2022-04-08 14:38:48.262992	\N	amanda@handsacrossthesea.org	f	Amanda	Sherlip	OFFICER	ANTIGUA_AND_BARBUDA	\\x1df2443c0a5c9f35e4201f9a8745b205cc748fa7294703ea06ce0b94391c9356ea662ad0d701de88f07feb477c532a0f	f
+12	2022-04-08 14:54:57.346628	2022-04-08 14:54:57.346628	\N	domnitjenmag@gmail.com	f	Giselle	Laurent	OFFICER	DOMINICA	\\xacb0971f139340392215737033b1be957dadeb06f80fb019366e23c71e5c3601d7d03a787bef61b9c5f40a444f18dc84	f
+\.
+
+
+--
+-- Data for Name: verification_keys; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.verification_keys (id, created_at, updated_at, user_id, used, type) FROM stdin;
+\.
+
+
+--
+-- Name: book_logs_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.book_logs_id_seq', 2966, true);
+
+
+--
+-- Name: school_contacts_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.school_contacts_id_seq', 19, true);
+
+
+--
+-- Name: school_reports_with_libraries_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.school_reports_with_libraries_id_seq', 7, true);
+
+
+--
+-- Name: school_reports_without_libraries_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.school_reports_without_libraries_id_seq', 1, true);
+
+
+--
+-- Name: schools_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.schools_id_seq', 988, true);
+
+
+--
+-- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.users_id_seq', 12, true);
+
+
+--
+-- Name: blacklisted_refreshes blacklisted_refreshes_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.blacklisted_refreshes
+    ADD CONSTRAINT blacklisted_refreshes_pkey PRIMARY KEY (refresh_hash);
+
+
+--
+-- Name: book_logs book_logs_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.book_logs
+    ADD CONSTRAINT book_logs_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: flyway_schema_history flyway_schema_history_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.flyway_schema_history
+    ADD CONSTRAINT flyway_schema_history_pk PRIMARY KEY (installed_rank);
+
+
+--
+-- Name: school_contacts school_contacts_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.school_contacts
+    ADD CONSTRAINT school_contacts_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: school_reports_with_libraries school_reports_with_libraries_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.school_reports_with_libraries
+    ADD CONSTRAINT school_reports_with_libraries_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: school_reports_without_libraries school_reports_without_libraries_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.school_reports_without_libraries
+    ADD CONSTRAINT school_reports_without_libraries_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: schools schools_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.schools
+    ADD CONSTRAINT schools_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: verification_keys verification_keys_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.verification_keys
+    ADD CONSTRAINT verification_keys_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: flyway_schema_history_s_idx; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX flyway_schema_history_s_idx ON public.flyway_schema_history USING btree (success);
+
+
+--
+-- Name: blacklisted_refreshes bl_refs_trig_set_updated_at; Type: TRIGGER; Schema: public; Owner: postgres
+--
+
+CREATE TRIGGER bl_refs_trig_set_updated_at BEFORE UPDATE ON public.blacklisted_refreshes FOR EACH ROW EXECUTE FUNCTION public.func_set_updated_at_timestamp();
+
+
+--
+-- Name: book_logs book_flows_updated_at; Type: TRIGGER; Schema: public; Owner: postgres
+--
+
+CREATE TRIGGER book_flows_updated_at BEFORE UPDATE ON public.book_logs FOR EACH ROW EXECUTE FUNCTION public.func_set_updated_at_timestamp();
+
+
+--
+-- Name: school_contacts schools_add_cts_trig_set_updated_at; Type: TRIGGER; Schema: public; Owner: postgres
+--
+
+CREATE TRIGGER schools_add_cts_trig_set_updated_at BEFORE UPDATE ON public.school_contacts FOR EACH ROW EXECUTE FUNCTION public.func_set_updated_at_timestamp();
+
+
+--
+-- Name: schools schools_trig_set_updated_at; Type: TRIGGER; Schema: public; Owner: postgres
+--
+
+CREATE TRIGGER schools_trig_set_updated_at BEFORE UPDATE ON public.schools FOR EACH ROW EXECUTE FUNCTION public.func_set_updated_at_timestamp();
+
+
+--
+-- Name: users users_trig_set_updated_at; Type: TRIGGER; Schema: public; Owner: postgres
+--
+
+CREATE TRIGGER users_trig_set_updated_at BEFORE UPDATE ON public.users FOR EACH ROW EXECUTE FUNCTION public.func_set_updated_at_timestamp();
+
+
+--
+-- Name: book_logs fk_book_flows_school; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.book_logs
+    ADD CONSTRAINT fk_book_flows_school FOREIGN KEY (school_id) REFERENCES public.schools(id);
+
+
+--
+-- Name: school_contacts fk_school_contact_school; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.school_contacts
+    ADD CONSTRAINT fk_school_contact_school FOREIGN KEY (school_id) REFERENCES public.schools(id);
+
+
+--
+-- Name: school_reports_with_libraries fk_school_report_lib_school; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.school_reports_with_libraries
+    ADD CONSTRAINT fk_school_report_lib_school FOREIGN KEY (school_id) REFERENCES public.schools(id);
+
+
+--
+-- Name: school_reports_with_libraries fk_school_report_lib_user; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.school_reports_with_libraries
+    ADD CONSTRAINT fk_school_report_lib_user FOREIGN KEY (user_id) REFERENCES public.users(id);
+
+
+--
+-- Name: school_reports_without_libraries fk_school_report_wo_lib_school; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.school_reports_without_libraries
+    ADD CONSTRAINT fk_school_report_wo_lib_school FOREIGN KEY (school_id) REFERENCES public.schools(id);
+
+
+--
+-- Name: school_reports_without_libraries fk_school_report_wo_lib_user; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.school_reports_without_libraries
+    ADD CONSTRAINT fk_school_report_wo_lib_user FOREIGN KEY (user_id) REFERENCES public.users(id);
+
+
+--
+-- Name: verification_keys verification_keys_user_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.verification_keys
+    ADD CONSTRAINT verification_keys_user_id_fk FOREIGN KEY (user_id) REFERENCES public.users(id);
+
+
+--
+-- Name: SCHEMA public; Type: ACL; Schema: -; Owner: postgres
+--
+
+REVOKE ALL ON SCHEMA public FROM rdsadmin;
+REVOKE ALL ON SCHEMA public FROM PUBLIC;
+GRANT ALL ON SCHEMA public TO postgres;
+GRANT ALL ON SCHEMA public TO PUBLIC;
+
+
+--
+-- PostgreSQL database dump complete
+--
+
