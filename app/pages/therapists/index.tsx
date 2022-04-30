@@ -1,21 +1,36 @@
-import { Suspense } from "react"
-import { Head, Link, usePaginatedQuery, useRouter, BlitzPage, Routes } from "blitz"
 import Layout from "app/core/layouts/Layout"
 import getTherapists from "app/therapists/queries/getTherapists"
+import { BlitzPage, Head, Link, Routes, usePaginatedQuery, useRouter } from "blitz"
+import { Suspense } from "react"
 
-const ITEMS_PER_PAGE = 3
+const ITEMS_PER_PAGE = 20
+
+/**
+ * @example coerceParamToMaybeString(["a", "b", "c"]) // -> "a,b,c"
+ * @example coerceParamToMaybeString("abc")           // -> "abc"
+ * @example coerceParamToMaybeString(undefined)       // -> undefined
+ */
+function coerceParamToMaybeString(param: string[] | string | undefined): string | undefined {
+  if (Array.isArray(param)) {
+    return param.join(",")
+  }
+  return param
+}
 
 export const TherapistsList = () => {
   const router = useRouter()
-  const searchQuery = router.query.search || undefined
+  const search = coerceParamToMaybeString(router.query.search)
   const page = Number(router.query.page) || 0
   const [{ therapists, hasMore }] = usePaginatedQuery(getTherapists, {
     where: {
-      body: {
-        search: searchQuery,
-      }
+      name: {
+        search: search,
+      },
+      description: {
+        search: search,
+      },
     },
-    orderBy: { id: "asc" },
+    orderBy: search === undefined ? { id: "asc" } : undefined,
     skip: ITEMS_PER_PAGE * page,
     take: ITEMS_PER_PAGE,
   })
@@ -67,7 +82,7 @@ const TherapistsPage: BlitzPage = () => {
   )
 }
 
-TherapistsPage.authenticate = true
+TherapistsPage.authenticate = false
 TherapistsPage.getLayout = (page) => <Layout>{page}</Layout>
 
 export default TherapistsPage

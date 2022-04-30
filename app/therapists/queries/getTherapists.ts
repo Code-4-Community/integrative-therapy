@@ -2,13 +2,11 @@ import { paginate, resolver } from "blitz"
 import db, { Prisma } from "db"
 
 interface GetTherapistsInput
-  extends Pick<Prisma.TherapistFindManyArgs, "where" | "orderBy" | "skip" | "take"> {
-  searchQuery: string | undefined
-}
+  extends Pick<Prisma.TherapistFindManyArgs, "where" | "orderBy" | "skip" | "take"> {}
 
 export default resolver.pipe(
   resolver.authorize(),
-  async ({ where, orderBy, skip = 0, take = 100, searchQuery }: GetTherapistsInput) => {
+  async ({ where, orderBy, skip = 0, take = 100 }: GetTherapistsInput) => {
     // TODO: in multi-tenant app, you must add validation to ensure correct tenant
     const {
       items: therapists,
@@ -21,11 +19,10 @@ export default resolver.pipe(
       count: () => db.therapist.count({ where }),
       query: (paginateArgs) =>
         db.therapist.findMany({
-          ...paginateArgs, where: {
-            body: {
-              search: 'cat',
-            }
-          }, orderBy }),
+          ...paginateArgs,
+          orderBy,
+          where,
+        }),
     })
 
     return {
