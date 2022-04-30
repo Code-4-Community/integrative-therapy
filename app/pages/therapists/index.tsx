@@ -3,12 +3,18 @@ import { Head, Link, usePaginatedQuery, useRouter, BlitzPage, Routes } from "bli
 import Layout from "app/core/layouts/Layout"
 import getTherapists from "app/therapists/queries/getTherapists"
 
-const ITEMS_PER_PAGE = 100
+const ITEMS_PER_PAGE = 3
 
 export const TherapistsList = () => {
   const router = useRouter()
+  const searchQuery = router.query.search || undefined
   const page = Number(router.query.page) || 0
   const [{ therapists, hasMore }] = usePaginatedQuery(getTherapists, {
+    where: {
+      body: {
+        search: searchQuery,
+      }
+    },
     orderBy: { id: "asc" },
     skip: ITEMS_PER_PAGE * page,
     take: ITEMS_PER_PAGE,
