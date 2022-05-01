@@ -18,11 +18,12 @@ describe("Login", () => {
 
   describe("with valid credentials", () => {
     it("logs in", () => {
-      const attrs = { password: "superstrongpassword" }
+      const attrs = { email: "test.user@email.com", password: "superstrongpassword" }
 
       cy.visit("/login").wait(100)
 
       cy.task("factory", { name: "user", attrs }).then((user: User) => {
+        cy.log("email", user.email)
         cy.findByLabelText(/email/i).type(user.email)
         cy.findByLabelText(/password/i).type(attrs.password)
         cy.findAllByRole("button", { name: /login/i }).click()

@@ -4,7 +4,7 @@ import db from "db"
 import { Role } from "types"
 
 export default resolver.pipe(resolver.zod(Signup), async ({ email, password }, ctx: Ctx) => {
-  const user = await createNewUser(password, email)
+  const user = await createNewUser(email, password)
 
   await ctx.session.$create({ userId: user.id, role: user.role as Role })
   return user
