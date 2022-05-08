@@ -1,18 +1,18 @@
 import Layout from "app/core/layouts/Layout"
 import getTherapists from "app/therapists/queries/getTherapists"
-import { BlitzPage, Head, Link, Routes, usePaginatedQuery, useRouter } from "blitz"
+import { BlitzPage, Head, Link, Routes, useQuery, useRouter } from "blitz"
 import { Suspense, useRef } from "react"
 
-const ITEMS_PER_PAGE = 20
-
 /**
- * @example coerceParamToMaybeString(["a", "b", "c"]) // -> "a,b,c"
+ * https://www.prisma.io/docs/concepts/components/prisma-client/full-text-search#querying-the-database
+ * @example coerceParamToMaybeString(["a", "b", "c"]) // -> "a|b|c"
+ * @example coerceParamToMaybeString("a b c") // -> "a|b|c"
  * @example coerceParamToMaybeString("abc")           // -> "abc"
- * @example coerceParamToMaybeString(undefined)       // -> undefined
+ * @example coerceParamToMaybeString(undefined)       // -> ""
  */
-function coerceToMaybeSearchQuery(param: string[] | string | undefined): string {
+export function coerceToMaybeSearchQuery(param: string[] | string | undefined): string {
   if (Array.isArray(param)) {
-    return coerceToMaybeSearchQuery(param.join("|"))
+    return coerceToMaybeSearchQuery(param.join(" "))
   } else if (typeof param === "string") {
     return param.trim().split(new RegExp("\\s+")).join("|")
   } else {
@@ -23,9 +23,7 @@ function coerceToMaybeSearchQuery(param: string[] | string | undefined): string 
 export const TherapistsList = () => {
   const router = useRouter()
   const searchQueryParam = coerceToMaybeSearchQuery(router.query.search)
-  const page = Number(router.query.page) || 0
-  console.log("searchQueryParam", searchQueryParam)
-  const [{ therapists, hasMore }] = usePaginatedQuery(getTherapists, {
+  const [therapists] = useQuery(getTherapists, {
     where: {
       OR: [
         {
@@ -52,13 +50,8 @@ export const TherapistsList = () => {
       },
       { id: "asc" },
     ],
-    skip: ITEMS_PER_PAGE * page,
-    take: ITEMS_PER_PAGE,
+    targetZipcode: "02120",
   })
-
-  const goToPreviousPage = () =>
-    router.push({ query: { page: page - 1, search: searchQueryParam } })
-  const goToNextPage = () => router.push({ query: { page: page + 1, search: searchQueryParam } })
 
   const searchInput = useRef<HTMLInputElement>(null)
 
@@ -91,6 +84,9 @@ export const TherapistsList = () => {
               <Link href={Routes.ShowTherapistPage({ therapistId: therapist.id })}>
                 <a>{therapist.name}</a>
               </Link>
+              <span style={{ marginLeft: "1em" }}>
+                {therapist.distance} {typeof therapist.distance === "number" && "miles away"}
+              </span>
             </li>
           ))}
         </ul>
@@ -106,13 +102,6 @@ export const TherapistsList = () => {
           </p>
         </section>
       )}
-
-      <button disabled={page === 0} onClick={goToPreviousPage}>
-        Previous
-      </button>
-      <button disabled={!hasMore} onClick={goToNextPage}>
-        Next
-      </button>
     </div>
   )
 }
