@@ -26,6 +26,9 @@ Run your app in the development mode.
 blitz dev
 ```
 
+If you get a `blitz` is not found, `yarn`'s `bin` may not have automatically been added to your `PATH`, see fix here: https://github.com/yarnpkg/yarn/issues/5353#issuecomment-460556192
+
+
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 ## Environment Variables
